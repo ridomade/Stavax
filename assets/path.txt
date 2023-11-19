@@ -1,0 +1,9 @@
+assets/playlist1/playlist1_gambar1.jpg
+assets/playlist1/playlist1_gambar2.jpg
+assets/playlist1/playlist1_gambar3.jpg
+assets/playlist1/playlist2_gambar1.jpg
+assets/playlist1/playlist2_gambar2.jpg
+assets/playlist1/playlist2_gambar3.jpg
+assets/playlist1/playlist3_gambar1.jpg
+assets/playlist1/playlist3_gambar2.jpg
+assets/playlist1/playlist3_gambar3.jpg

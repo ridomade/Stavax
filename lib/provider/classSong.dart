@@ -1,0 +1,75 @@
+import 'package:flutter/material.dart';
+
+class Songs extends ChangeNotifier {
+  String id;
+  String title;
+  String artist;
+  String image;
+  String song;
+
+  Songs(
+      {required this.id,
+      required this.title,
+      required this.artist,
+      required this.image,
+      required this.song});
+}
+
+List<Songs> songArr = [
+  Songs(
+    id: "1",
+    title: "Flaming Hot Cheetos",
+    artist: "Clairo",
+    image: "assets/playlist1/playlist1_gambar1.jpg",
+    song: "assets/song/Flaming_Hot_Cheetos.mp3",
+  ),
+  Songs(
+      id: "2",
+      title: "Like I Need You",
+      artist: "Keshi",
+      image: "assets/playlist1/playlist1_gambar2.jpg",
+      song: "assets/song/Like_I_Need_You.mp3"),
+  Songs(
+    id: "3",
+    title: "505",
+    artist: "Arctic Monkeys",
+    image: "assets/playlist1/playlist1_gambar3.jpg",
+    song: "assets/song/505.mp3",
+  ),
+  Songs(
+      id: "4",
+      title: "Runaway",
+      artist: "Aurora",
+      image: "assets/playlist2/playlist2_gambar1.jpg",
+      song: "assets/song/Runaway.mp3"),
+  Songs(
+      id: "5",
+      title: "Location Unknown",
+      artist: "HONNE",
+      image: "assets/playlist2/playlist2_gambar2.jpg",
+      song: "assets/song/Location_Unknown.mp3"),
+  Songs(
+      id: "6",
+      title: "Listerine",
+      artist: "Dayglow",
+      image: "assets/playlist2/playlist2_gambar3.jpg",
+      song: "assets/song/Listerine.mp3"),
+  Songs(
+      id: "7",
+      title: "Duvet",
+      artist: "Boa",
+      image: "assets/playlist3/playlist3_gambar1.jpg",
+      song: "assets/song/Duvet.mp3"),
+  Songs(
+      id: "8",
+      title: "Shut Up My Mom's calling",
+      artist: "Hotel Ugly",
+      image: "assets/playlist3/playlist3_gambar2.jpg",
+      song: "assets/song/Shut_Up_My_Mom_s_Calling.mp3"),
+  Songs(
+      id: "9",
+      title: "Moonlight",
+      artist: "Kali Uchis",
+      image: "assets/playlist3/playlist3_gambar3.jpg",
+      song: "assets/song/Moonlight.mp3"),
+];

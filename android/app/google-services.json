@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "992553463677",
+    "project_id": "stavax-new",
+    "storage_bucket": "stavax-new.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:992553463677:android:a6fe0cadd15422fdcc2614",
+        "android_client_info": {
+          "package_name": "com.example.stavax_new"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDvk6obu_cvLFMauUTxLHIApb22Ts1qFwc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
