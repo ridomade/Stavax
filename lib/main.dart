@@ -44,6 +44,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => Playlist())
       ],
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'Stavax',
         theme: ThemeData(fontFamily: 'Poppins'),
         home: loginAndSignUp(), // Gantilah Home() dengan widget utama Anda
