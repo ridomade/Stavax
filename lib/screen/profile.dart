@@ -22,6 +22,7 @@ class _profileState extends State<profile> {
   final db = FirebaseFirestore.instance;
   String userName = " ";
   String email = " ";
+  bool artistRole = false;
 
   @override
   void initState() {
@@ -39,6 +40,7 @@ class _profileState extends State<profile> {
         setState(() {
           userName = event['userName'];
           email = event['email'];
+          artistRole = event['artistRole'];
         });
         // userName = event['userName'];
       },
@@ -175,72 +177,84 @@ class _profileState extends State<profile> {
                     color: Color(0xff313842),
                   ),
                   child: InkWell(
-                    onTap: () {
-                      showModalBottomSheet<void>(
-                        backgroundColor: Colors.transparent,
-                        context: context,
-                        builder: (BuildContext context) {
-                          return Container(
-                            padding: EdgeInsets.symmetric(
-                                vertical: 15, horizontal: 10),
-                            height: 200,
-                            decoration: BoxDecoration(
-                              color: Color(0xff004e96),
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(24),
-                                topRight: Radius.circular(24),
+                    onTap: () async {
+                      if (artistRole) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => artistscreen(),
+                          ),
+                        );
+                      } else {
+                        await showModalBottomSheet<void>(
+                          backgroundColor: Colors.transparent,
+                          context: context,
+                          builder: (BuildContext context) {
+                            return Container(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 15, horizontal: 10),
+                              height: 200,
+                              decoration: BoxDecoration(
+                                color: Color(0xff004e96),
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(24),
+                                  topRight: Radius.circular(24),
+                                ),
                               ),
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  "Are you sure want to join as STAVAX Artist?",
-                                  style: TextStyle(
-                                    fontSize: 24,
-                                    color: Colors.white,
+                              child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "Are you sure want to join as STAVAX Artist?",
+                                    style: TextStyle(
+                                      fontSize: 24,
+                                      color: Colors.white,
+                                    ),
+                                    textAlign: TextAlign.center,
                                   ),
-                                  textAlign: TextAlign.center,
-                                ),
-                                InkWell(
-                                  onTap: () {
-                                    FirebaseFirestore.instance
-                                        .collection('Users')
-                                        .doc(FirebaseAuth
-                                            .instance.currentUser!.uid)
-                                        .update({'artistRole': true});
-                                    Navigator.pop(context);
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => artistscreen(),
+                                  InkWell(
+                                    onTap: () async {
+                                      await FirebaseFirestore.instance
+                                          .collection('Users')
+                                          .doc(FirebaseAuth
+                                              .instance.currentUser!.uid)
+                                          .update({'artistRole': true});
+
+                                      Navigator.pop(context);
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => artistscreen(),
+                                        ),
+                                      );
+                                    },
+                                    child: Container(
+                                      height: 70,
+                                      width: double.infinity,
+                                      decoration: BoxDecoration(
+                                        color: Color(0xff3373b0),
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(10),
+                                        ),
                                       ),
-                                    );
-                                  },
-                                  child: Container(
-                                    height: 70,
-                                    width: double.infinity,
-                                    decoration: BoxDecoration(
-                                      color: Color(0xff3373b0),
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(10),
+                                      child: Center(
+                                        child: Text(
+                                          "Sure",
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              color: Colors.white),
+                                        ),
                                       ),
                                     ),
-                                    child: Center(
-                                      child: Text(
-                                        "Sure",
-                                        style: TextStyle(
-                                            fontSize: 18, color: Colors.white),
-                                      ),
-                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      );
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      }
                     },
                     child: Container(
                       width: 323,
@@ -250,11 +264,23 @@ class _profileState extends State<profile> {
                         color: Color(0xff3373b0),
                       ),
                       child: Center(
-                        child: Text("Join As Artist",
-                            style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white)),
+                        child: artistRole
+                            ? Text(
+                                "Move to Artist Page",
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : Text(
+                                "Join As Artist",
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
+                              ),
                       ),
                     ),
                   )),
