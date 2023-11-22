@@ -35,11 +35,21 @@ class playlist_home extends StatelessWidget {
           children: [
             Container(
               alignment: Alignment.topCenter,
-              child: Image.file(
-                File(iniplaylist.image),
-                width: 100,
-                height: 100,
-              ),
+              child: iniplaylist.image != null
+                  ? File(iniplaylist.image)
+                          .existsSync() // Check if it's a local file
+                      ? Image.file(
+                          File(iniplaylist.image),
+                          width: 100,
+                          height: 100,
+                        )
+                      : Image.network(
+                          iniplaylist.image,
+                          width: 100,
+                          height: 100,
+                        )
+                  : SizedBox
+                      .shrink(), // An empty container, you can use other widgets like Container() if needed
             ),
             const SizedBox(
               height: 20,

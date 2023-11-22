@@ -6,6 +6,8 @@ class Playlist extends ChangeNotifier {
   String name;
   String image;
   String desc;
+  String imageUrl;
+  String imageNameInStorages;
   List<Songs> songList = [];
 
   Playlist({
@@ -13,5 +15,7 @@ class Playlist extends ChangeNotifier {
     this.name = "",
     this.image = "",
     this.desc = "",
+    this.imageUrl = "",
+    this.imageNameInStorages = "",
   });
 }

@@ -21,7 +21,8 @@ List<Songs> songArr = [
     title: "Flaming Hot Cheetos",
     artist: "Clairo",
     image: "assets/playlist1/playlist1_gambar1.jpg",
-    song: "assets/song/Flaming_Hot_Cheetos.mp3",
+    song:
+        "https://firebasestorage.googleapis.com/v0/b/stavax-new.appspot.com/o/yt5s.com%20-%20Mission%20Impossible%20Theme%20Song%20(Flute%20Cover)%20(128%20kbps).mp3?alt=media&token=2ee5af18-0e6f-4555-b6c6-0b005ff26c64",
   ),
   Songs(
       id: "2",

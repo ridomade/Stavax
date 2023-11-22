@@ -206,10 +206,23 @@ class _BuildPlaylistScreenState extends State<_buildPlaylistScreen> {
               child: Container(
                 child: Row(
                   children: [
-                    Image.file(
-                      File(widget.initialPlaylist.image),
-                      height: 70,
-                      width: 70,
+                    Container(
+                      alignment: Alignment.topCenter,
+                      child: widget.initialPlaylist.image != null
+                          ? File(widget.initialPlaylist.image)
+                                  .existsSync() // Check if it's a local file
+                              ? Image.file(
+                                  File(widget.initialPlaylist.image),
+                                  width: 100,
+                                  height: 100,
+                                )
+                              : Image.network(
+                                  widget.initialPlaylist.image,
+                                  width: 100,
+                                  height: 100,
+                                )
+                          : SizedBox
+                              .shrink(), // An empty container, you can use other widgets like Container() if needed
                     ),
                     const SizedBox(
                       width: 8,
@@ -252,9 +265,9 @@ class _BuildPlaylistScreenState extends State<_buildPlaylistScreen> {
                   builder: (BuildContext context) {
                     return InkWell(
                       onTap: () {
-                        context
-                            .read<UsersProvider>()
-                            .deletePlaylist(playlist: widget.initialPlaylist);
+                        context.read<UsersProvider>().deletePlaylist(
+                              playlist: widget.initialPlaylist,
+                            );
                         Navigator.pop(context);
                       },
                       child: Container(

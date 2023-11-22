@@ -58,7 +58,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
     List<AudioSource> audioQuery = [];
     for (int i = 0; i < widget.listSong.length; i++) {
       audioQuery.add(AudioSource.uri(
-        Uri.parse('asset:///' + widget.listSong[i].song),
+        Uri.parse(widget.listSong[i].song),
         tag: MediaItem(
           id: widget.listSong[i].id.toString(), // Use toString() for id
           title: widget.listSong[i].title,

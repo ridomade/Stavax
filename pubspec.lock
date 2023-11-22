@@ -444,10 +444,10 @@ packages:
     dependency: transitive
     description:
       name: http
-      sha256: "759d1a329847dd0f39226c688d3e06a6b8679668e350e2891a6474f8b4bb8525"
+      sha256: "5895291c13fa8a3bd82e76d5627f69e0d85ca6a30dcac95c4ea19a5d555879c2"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.0"
+    version: "0.13.6"
   http_parser:
     dependency: transitive
     description:
@@ -641,7 +641,7 @@ packages:
     source: hosted
     version: "1.8.3"
   path_provider:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: path_provider
       sha256: a1aa8aaa2542a6bc57e381f132af822420216c80d4781f7aa085ca3229208aaa
@@ -897,10 +897,10 @@ packages:
     dependency: transitive
     description:
       name: twitter_login
-      sha256: "31ff9db2e37eda878b876a4ce6d1525f51d34b6cd9de9aa185b07027a23ab95b"
+      sha256: "6995d9a7822d9d0dcd2450357527f0154129938b757b2f504471c15b378b9007"
       url: "https://pub.dev"
     source: hosted
-    version: "4.4.2"
+    version: "4.4.0"
   typed_data:
     dependency: transitive
     description:
