@@ -336,10 +336,23 @@ class listPlaylist_user extends StatelessWidget {
                 Container(
                   child: Row(
                     children: [
-                      Image.file(
-                        File(initialPlaylist.image),
-                        height: 70,
-                        width: 70,
+                      Container(
+                        alignment: Alignment.topCenter,
+                        child: initialPlaylist.image != null
+                            ? File(initialPlaylist.image)
+                                    .existsSync() // Check if it's a local file
+                                ? Image.file(
+                                    File(initialPlaylist.image),
+                                    width: 100,
+                                    height: 100,
+                                  )
+                                : Image.network(
+                                    initialPlaylist.image,
+                                    width: 100,
+                                    height: 100,
+                                  )
+                            : SizedBox
+                                .shrink(), // An empty container, you can use other widgets like Container() if needed
                       ),
                       SizedBox(
                         width: 11,

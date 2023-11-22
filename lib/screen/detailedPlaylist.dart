@@ -53,10 +53,23 @@ class _detailedPlaylistState extends State<detailedPlaylist> {
                 SizedBox(
                   height: 32,
                 ),
-                Image.file(
-                  File(widget.iniPlaylist.image),
-                  height: 128,
-                  width: 128,
+                Container(
+                  alignment: Alignment.centerLeft,
+                  child: widget.iniPlaylist.image != null
+                      ? File(widget.iniPlaylist.image)
+                              .existsSync() // Check if it's a local file
+                          ? Image.file(
+                              File(widget.iniPlaylist.image),
+                              width: 100,
+                              height: 100,
+                            )
+                          : Image.network(
+                              widget.iniPlaylist.image,
+                              width: 100,
+                              height: 100,
+                            )
+                      : SizedBox
+                          .shrink(), // An empty container, you can use other widgets like Container() if needed
                 ),
                 SizedBox(
                   height: 13,

@@ -11,6 +11,7 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:uuid/uuid.dart';
 
 class makePlaylist extends StatefulWidget {
   const makePlaylist({super.key});
@@ -22,34 +23,102 @@ class makePlaylist extends StatefulWidget {
 class _makePlaylistState extends State<makePlaylist> {
   final namePlaylist = TextEditingController();
   final descPlaylist = TextEditingController();
-
   var filePath;
   var fileName;
   File? selectedImage;
   String?
       selectedImageFileName; // Tambahkan variabel untuk nama file gambar terpilih
+  // Future<void> getImage() async {
+  //   final imagePicker = ImagePicker();
+  //   final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
+  //   if (pickedFile != null) {
+  //     Directory appDocDir = await getApplicationDocumentsDirectory();
+  //     final imageFileName = pickedFile.name;
+  //     final imageFile = File(pickedFile.path);
+  //     final localImage = File('${appDocDir.path}/$imageFileName');
+  //     String filepath = imageFile.path;
+  //     String target = filepath.substring(filepath.lastIndexOf('/') + 1);
+  //     // final imageref = FirebaseStorage.instance.ref().child('Playlist/$target');
+  //     // File file = File(filepath);
+  //     try {
+  //       // await imageFile.copy(localImage.path);
+  //       // await imageref.putFile(
+  //       //     file,
+  //       //     SettableMetadata(
+  //       //       contentType: 'image/jpeg',
+  //       //     ));
+  //       // imageUrl = await imageref.getDownloadURL();
+  //       print("ini filename ${target}");
+  //       print("ini filepath ${filepath}");
+  //       setState(() {
+  //         fileName = target;
+  //         filePath = filepath;
+  //         selectedImage = localImage;
+  //         selectedImageFileName = imageFileName;
+  //       });
+  //     } catch (e) {
+  //       print('Error copying file: $e');
+  //     }
+  //   }
+  // }
+
+  final FirebaseStorage firebaseStorage = FirebaseStorage.instance;
+  // ignore: prefer_typing_uninitialized_variables
+  var imageUrl;
+  Future<void> uplaodFile(String fileName, String filePath) async {
+    File file = File(filePath);
+    final uuid = Uuid();
+    final uniqueId = uuid.v4();
+    fileName = uniqueId.toString() + fileName;
+    final imageref = firebaseStorage.ref('Playlist/$fileName');
+    try {
+      await imageref.putFile(
+          file,
+          SettableMetadata(
+            contentType: 'image/jpeg',
+          ));
+      //       setState(() {
+      //         imageNameInStorage = fileName;
+      // });
+      imageUrl = await imageref.getDownloadURL();
+      await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .collection("Playlist")
+          .add({
+        "namePlaylist": namePlaylist.text,
+        "descPlaylist": descPlaylist.text,
+        "imageUrl": imageUrl,
+        "imageName": fileName,
+        //add your data that you want to upload
+      });
+    } catch (e) {
+      print('Error copying file: $e');
+    }
+  }
+
   Future<void> getImage() async {
+    final uuid = Uuid();
+    final uniqueId = uuid.v4();
     final imagePicker = ImagePicker();
     final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      Directory appDocDir = await getApplicationDocumentsDirectory();
+      final appDocDir = await getApplicationDocumentsDirectory();
       final imageFileName = pickedFile.name;
+
+      // Convert XFile to File
       final imageFile = File(pickedFile.path);
-      final localImage = File('${appDocDir.path}/$imageFileName');
       String filepath = imageFile.path;
-      String target = filepath.substring(filepath.lastIndexOf('/') + 1);
-      // final imageref = FirebaseStorage.instance.ref().child('Playlist/$target');
-      // File file = File(filepath);
+      // Create a destination File in the application's documents directory
+      final localImage = File('${appDocDir.path}/$imageFileName');
+
+      // Copy the File
       try {
-        // await imageFile.copy(localImage.path);
-        // await imageref.putFile(
-        //     file,
-        //     SettableMetadata(
-        //       contentType: 'image/jpeg',
-        //     ));
-        // imageUrl = await imageref.getDownloadURL();
+        await imageFile.copy(localImage.path);
+        print("ini filename ${imageFileName}");
+        print("ini filepath ${filepath}");
         setState(() {
-          fileName = target;
+          fileName = imageFileName;
           filePath = filepath;
           selectedImage = localImage;
           selectedImageFileName = imageFileName;
@@ -59,51 +128,6 @@ class _makePlaylistState extends State<makePlaylist> {
       }
     }
   }
-
-  final FirebaseStorage firebaseStorage = FirebaseStorage.instance;
-  // ignore: prefer_typing_uninitialized_variables
-  var imageUrl;
-  Future<void> uplaodFile(String fileName, String filePath) async {
-    File file = File(filePath);
-    final imageref = firebaseStorage.ref('Playlist/$fileName');
-    try {
-      await imageref.putFile(
-          file,
-          SettableMetadata(
-            contentType: 'image/jpeg',
-          ));
-
-      imageUrl = await imageref.getDownloadURL();
-    } catch (e) {
-      print('Error copying file: $e');
-    }
-  }
-  // Future<void> getImage() async {
-  //   final imagePicker = ImagePicker();
-  //   final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
-  //   if (pickedFile != null) {
-  //     final appDocDir = await getApplicationDocumentsDirectory();
-  //     final imageFileName = pickedFile.name;
-
-  //     // Convert XFile to File
-  //     final imageFile = File(pickedFile.path);
-
-  //     // Create a destination File in the application's documents directory
-  //     final localImage = File('${appDocDir.path}/$imageFileName');
-
-  //     // Copy the File
-  //     try {
-  //       await imageFile.copy(localImage.path);
-
-  //       setState(() {
-  //         selectedImage = localImage;
-  //         selectedImageFileName = imageFileName;
-  //       });
-  //     } catch (e) {
-  //       print('Error copying file: $e');
-  //     }
-  //   }
-  // }
 
   Widget build(BuildContext context) {
     uploadToFirebase service = uploadToFirebase();
@@ -255,37 +279,17 @@ class _makePlaylistState extends State<makePlaylist> {
             Center(
               child: InkWell(
                 onTap: () async {
+                  await uplaodFile(fileName, filePath);
                   context.read<UsersProvider>().tambahPlaylistBaru(
                         namePlaylist: namePlaylist.text,
                         descPlaylist: descPlaylist.text,
                         selectedImage: selectedImage,
                         selectedImageFileName: selectedImageFileName,
+                        imageUrll: await imageUrl,
+                        // imageNameInStorages : imageNameInStorage,
                       );
-                  await uplaodFile(fileName, filePath);
-                  // final result = await FilePicker.platform
-                  //     .pickFiles(allowMultiple: false, type: FileType.any);
-                  // if (result == null) {
-                  //   print("Error: No file selected");
-                  // } else {
-                  //   final path = result.files.single.path;
-                  //   final fileName = result.files.single.name;
-                  //   service.uplaodFile(fileName, path!);
-                  // }
-                  await FirebaseFirestore.instance
-                      .collection('Users')
-                      .doc(FirebaseAuth.instance.currentUser!.uid)
-                      .collection("Playlist")
-                      .add({
-                    "namePlaylist": namePlaylist.text,
-                    "descPlaylist": descPlaylist.text,
-                    "imageUrl": imageUrl,
-                    //add your data that you want to upload
-                  });
+                  print(imageUrl);
                   Navigator.pop(context);
-                  print('Adding new playlist:');
-                  print('Name: $namePlaylist');
-                  print('Desc: $descPlaylist');
-                  print('Path gambar: ${selectedImage?.path}');
                 },
                 child: Container(
                   width: 94,

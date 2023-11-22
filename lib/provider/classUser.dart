@@ -1,9 +1,18 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:stavax_new/provider/classPlaylist.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:stavax_new/provider/classSong.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:io';
+
+import 'dart:io';
+import 'package:http/http.dart' as http;
+import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 
 class UsersProvider extends ChangeNotifier {
   String id;
@@ -30,6 +39,8 @@ class UsersProvider extends ChangeNotifier {
     required String descPlaylist,
     required File? selectedImage,
     required String? selectedImageFileName,
+    required String imageUrll,
+    // required String imageNameInStorage,
   }) async {
     final uuid = Uuid();
     if (namePlaylist.isNotEmpty &&
@@ -40,7 +51,6 @@ class UsersProvider extends ChangeNotifier {
       final imageFileName =
           selectedImageFileName; // Menggunakan nama file yang terpilih
       final localImage = File("${appDocDir.path}/$imageFileName");
-
       // Mengecek apakah file lokal ada
       if (await localImage.exists()) {
         final uniqueId = uuid.v4();
@@ -51,6 +61,8 @@ class UsersProvider extends ChangeNotifier {
           name: namePlaylist, // Menggunakan value dari namePlaylist
           image: localImage.path,
           desc: descPlaylist, // Menggunakan value dari descPlaylist
+          imageUrl: imageUrll,
+          // imageNameInStorages: imageNameInStorage,
         ));
         notifyListeners();
         // Bersihkan input setelah menambah playlist baru
@@ -62,7 +74,59 @@ class UsersProvider extends ChangeNotifier {
     }
   }
 
-  void deletePlaylist({required Playlist playlist}) async {
+  void tambahPlaylistBaru2({
+    required String namePlaylist,
+    required String descPlaylist,
+    required String selectedImage,
+    required String? selectedImageFileName,
+  }) async {
+    final uuid = Uuid();
+    final uniqueId = uuid.v4();
+    if (namePlaylist.isNotEmpty &&
+        selectedImage != null &&
+        selectedImageFileName != null) {
+      playListArr.add(Playlist(
+        id: uniqueId.toString(), // Sesuaikan dengan kebutuhan
+        name: namePlaylist, // Menggunakan value dari namePlaylist
+        image: selectedImage,
+        desc: descPlaylist, // Menggunakan value dari descPlaylist
+      ));
+      notifyListeners();
+      // Bersihkan input setelah menambah playlist baru
+      // Lakukan tindakan lain setelah berhasil menambahkan playlist
+    }
+  }
+
+  void deletePlaylist({
+    required Playlist playlist,
+  }) async {
+    await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection("Playlist")
+        .get()
+        .then(
+      (querySnapshot) async {
+        for (var docSnapshot in querySnapshot.docs) {
+          if (docSnapshot.data()["namePlaylist"] == playlist.name &&
+              docSnapshot.data()["descPlaylist"] == playlist.desc &&
+              docSnapshot.data()["imageUrl"] == playlist.imageUrl) {
+            print("tesssssssssss");
+            // print("ini image url dari database");
+            // print(docSnapshot.data()['imageUrl']);
+            // print("ini image url dari lokal");
+            // print(playlist.image);
+            String deleteStorage = docSnapshot.data()["imageName"];
+            final desertRef = FirebaseStorage.instance
+                .ref()
+                .child("Playlist/" + deleteStorage);
+            await desertRef.delete();
+            await docSnapshot.reference.delete();
+          }
+        }
+      },
+      onError: (e) => print("Error completing: $e"),
+    );
     playListArr.remove(playlist);
     notifyListeners();
   }

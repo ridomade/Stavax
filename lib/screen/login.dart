@@ -1,5 +1,10 @@
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:stavax_new/constants/colors.dart';
+import 'package:stavax_new/provider/classUser.dart';
 import 'package:stavax_new/screen/home.dart';
 import '../widgets/resuablePopUp.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -120,13 +125,56 @@ class _loginState extends State<login> {
                   width: 94,
                 ),
                 InkWell(
-                  onTap: () {
+                  onTap: () async {
                     FirebaseAuth.instance
                         .signInWithEmailAndPassword(
                             email: _emailTextController.text.trim(),
                             password: _passwordTextController.text)
-                        .then((value) {
+                        .then((value) async {
                       showAlertDialog(context, "Login Berhasil");
+
+                      await FirebaseFirestore.instance
+                          .collection('Users')
+                          .doc(FirebaseAuth.instance.currentUser!.uid)
+                          .collection("Playlist")
+                          .get()
+                          .then(
+                        (querySnapshot) {
+                          for (var docSnapshot in querySnapshot.docs) {
+                            context.read<UsersProvider>().tambahPlaylistBaru2(
+                                  namePlaylist:
+                                      docSnapshot.data()['namePlaylist'],
+                                  descPlaylist:
+                                      docSnapshot.data()['descPlaylist'],
+                                  selectedImage: docSnapshot.data()['imageUrl'],
+                                  selectedImageFileName:
+                                      docSnapshot.data()['imageName'],
+                                );
+                          }
+                        },
+                        onError: (e) => print("Error completing: $e"),
+                      );
+
+                      // QuerySnapshot querySnapshot = await FirebaseFirestore
+                      //     .instance
+                      //     .collection('Users')
+                      //     .doc(FirebaseAuth.instance.currentUser!.uid)
+                      //     .collection("Playlist")
+                      //     .get();
+                      // final allData =
+                      //     querySnapshot.docs.map((doc) => doc.data()).toList();
+                      // print("INi all data :");
+                      // for (var i = 0; i < allData.length; i++) {
+                      //   print(allData[i]);
+                      // }
+
+                      // loop read all data playlist curr user
+                      // context.read<UsersProvider>().showAllCurrUserPlaylist(
+                      //     // namePlaylist: namePlaylist.text,
+                      //     // descPlaylist: descPlaylist.text,
+                      //     // selectedImage: selectedImage,
+                      //     // selectedImageFileName: selectedImageFileName,
+                      // );
                       Navigator.push(
                         context,
                         MaterialPageRoute(
