@@ -149,6 +149,7 @@ class _loginState extends State<login> {
                                   selectedImage: docSnapshot.data()['imageUrl'],
                                   selectedImageFileName:
                                       docSnapshot.data()['imageName'],
+                                  imageUrll: docSnapshot.data()['imageUrl'],
                                 );
                           }
                         },

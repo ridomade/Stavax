@@ -79,6 +79,7 @@ class UsersProvider extends ChangeNotifier {
     required String descPlaylist,
     required String selectedImage,
     required String? selectedImageFileName,
+    required String imageUrll,
   }) async {
     final uuid = Uuid();
     final uniqueId = uuid.v4();
@@ -90,6 +91,7 @@ class UsersProvider extends ChangeNotifier {
         name: namePlaylist, // Menggunakan value dari namePlaylist
         image: selectedImage,
         desc: descPlaylist, // Menggunakan value dari descPlaylist
+        imageUrl: imageUrll,
       ));
       notifyListeners();
       // Bersihkan input setelah menambah playlist baru
@@ -108,15 +110,16 @@ class UsersProvider extends ChangeNotifier {
         .then(
       (querySnapshot) async {
         for (var docSnapshot in querySnapshot.docs) {
-          if (docSnapshot.data()["namePlaylist"] == playlist.name &&
-              docSnapshot.data()["descPlaylist"] == playlist.desc &&
-              docSnapshot.data()["imageUrl"] == playlist.imageUrl) {
+          if (await docSnapshot.data()["namePlaylist"] == playlist.name &&
+              await docSnapshot.data()["descPlaylist"] == playlist.desc &&
+              await docSnapshot.data()["imageUrl"] == playlist.imageUrl) {
             print("tesssssssssss");
             // print("ini image url dari database");
             // print(docSnapshot.data()['imageUrl']);
             // print("ini image url dari lokal");
             // print(playlist.image);
-            String deleteStorage = docSnapshot.data()["imageName"];
+            String deleteStorage = await docSnapshot.data()["imageName"];
+            print("test");
             final desertRef = FirebaseStorage.instance
                 .ref()
                 .child("Playlist/" + deleteStorage);
