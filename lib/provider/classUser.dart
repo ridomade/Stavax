@@ -119,6 +119,7 @@ class UsersProvider extends ChangeNotifier {
             // print("ini image url dari lokal");
             // print(playlist.image);
             String deleteStorage = await docSnapshot.data()["imageName"];
+            print("test");
             final desertRef = FirebaseStorage.instance
                 .ref()
                 .child("Playlist/" + deleteStorage);
