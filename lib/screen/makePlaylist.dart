@@ -147,7 +147,7 @@ class _makePlaylistState extends State<makePlaylist> {
               icon: Icon(
                 Icons.arrow_back_rounded,
                 color: Colors.white,
-                size: 34,
+                size: 30,
               ),
             ),
           ],

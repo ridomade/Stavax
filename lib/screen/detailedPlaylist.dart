@@ -38,6 +38,7 @@ class _detailedPlaylistState extends State<detailedPlaylist> {
               icon: Icon(
                 Icons.arrow_back_rounded,
                 color: Colors.white,
+                size: 30,
               ),
             ),
           ],
@@ -185,9 +186,16 @@ class listPlaylistSong extends StatelessWidget {
           onTap: () {
             Navigator.push(context, MaterialPageRoute(builder: (context) {
               return AudioPlayerScreen(
-                  listSong: iniplaylistSong.songList,
-                  song: iniplaylistSong.songList[CurrIdx],
-                  CurrIdx: CurrIdx);
+                listSong: iniplaylistSong.songList,
+                song: iniplaylistSong
+                    .songList[CurrIdx], // Use widget.currIdx here
+                CurrIdx: CurrIdx,
+              );
+
+              // AudioPlayerScreen(
+              //     listSong: iniplaylistSong.songList,
+              //     song: iniplaylistSong.songList[CurrIdx],
+              //     CurrIdx: CurrIdx);
             }));
           },
           child: Container(
@@ -204,7 +212,32 @@ class listPlaylistSong extends StatelessWidget {
                 Container(
                   child: Row(
                     children: [
-                      Image.asset(iniplaylistSong.songList[CurrIdx].image),
+                      Container(
+                        alignment: Alignment.topCenter,
+                        child: iniplaylistSong.songList[CurrIdx].image != null
+                            ? File(iniplaylistSong.songList[CurrIdx].image)
+                                    .existsSync() // Check if it's a local file
+                                ? Image.file(
+                                    File(iniplaylistSong
+                                        .songList[CurrIdx].image),
+                                    width: 56,
+                                    height: 56,
+                                  )
+                                : iniplaylistSong.songList[CurrIdx].image
+                                        .startsWith(
+                                            'assets/') // Check if it's an asset
+                                    ? Image.asset(
+                                        iniplaylistSong.songList[CurrIdx].image,
+                                        width: 56,
+                                        height: 56,
+                                      )
+                                    : Image.network(
+                                        iniplaylistSong.songList[CurrIdx].image,
+                                        width: 56,
+                                        height: 56,
+                                      )
+                            : SizedBox.shrink(),
+                      ),
                       SizedBox(
                         width: 11,
                       ),

@@ -1,7 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:stavax_new/constants/colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:stavax_new/provider/classSong.dart';
+import 'package:stavax_new/provider/classUser.dart';
+import 'package:stavax_new/screen/uploadSong.dart';
 
 class artistscreen extends StatefulWidget {
   const artistscreen({super.key});
@@ -56,7 +62,7 @@ class _artistscreenState extends State<artistscreen> {
                 icon: Icon(
                   Icons.arrow_back_rounded,
                   color: Colors.white,
-                  size: 34,
+                  size: 30,
                 ),
               ),
               Text(
@@ -128,10 +134,39 @@ class _artistscreenState extends State<artistscreen> {
                   SizedBox(
                     height: 10,
                   ),
-                  ListSong(),
-                  ListSong(),
-                  ListSong(),
-                  ListSong(),
+                  Expanded(
+                    child: context.watch<UsersProvider>().songArtist.isEmpty
+                        ? Center(
+                            child: Text(
+                              "Your song is empty",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          )
+                        : ListView.builder(
+                            itemCount: context
+                                .watch<UsersProvider>()
+                                .songArtist
+                                .length,
+                            itemBuilder: (context, index) {
+                              if (index <
+                                  context
+                                      .watch<UsersProvider>()
+                                      .songArtist
+                                      .length) {
+                                return ListSong(
+                                    inisong: context
+                                        .watch<UsersProvider>()
+                                        .songArtist[index],
+                                    iniuser: context.watch<UsersProvider>(),
+                                    currIdx: index);
+                              }
+                            },
+                          ),
+                  ),
                 ],
               ),
             ),
@@ -152,7 +187,14 @@ class _artistscreenState extends State<artistscreen> {
                         borderRadius: BorderRadius.circular(10.0),
                       ),
                       elevation: 0,
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => uploadSong(),
+                          ),
+                        );
+                      },
                       child: Icon(
                         Icons.add_rounded,
                         size: 50,
@@ -169,7 +211,15 @@ class _artistscreenState extends State<artistscreen> {
 }
 
 class ListSong extends StatelessWidget {
-  const ListSong({Key? key}) : super(key: key);
+  final Songs inisong;
+  final UsersProvider iniuser;
+  final int currIdx;
+  const ListSong({
+    Key? key,
+    required this.inisong,
+    required this.iniuser,
+    required this.currIdx,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -190,7 +240,33 @@ class ListSong extends StatelessWidget {
             Container(
               child: Row(
                 children: [
-                  Image.asset('assets/playlist1/playlist1_gambar1.jpg'),
+                  Container(
+                    alignment: Alignment.topCenter,
+                    child: inisong.image != null
+                        ? File(inisong.image)
+                                .existsSync() // Check if it's a local file
+                            ? Image.file(
+                                File(inisong.image),
+                                width: 60,
+                                height: 60,
+                                fit: BoxFit.cover,
+                              )
+                            : inisong.image.startsWith(
+                                    'assets/') // Check if it's an asset
+                                ? Image.asset(
+                                    inisong.image,
+                                    width: 60,
+                                    height: 60,
+                                    fit: BoxFit.cover,
+                                  )
+                                : Image.network(
+                                    inisong.image,
+                                    width: 60,
+                                    height: 60,
+                                    fit: BoxFit.cover,
+                                  )
+                        : SizedBox.shrink(),
+                  ),
                   SizedBox(
                     width: 11,
                   ),
@@ -199,7 +275,7 @@ class ListSong extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "pppp",
+                        inisong.title,
                         style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -209,7 +285,7 @@ class ListSong extends StatelessWidget {
                         height: 3,
                       ),
                       Text(
-                        "pppp",
+                        inisong.artist,
                         style: TextStyle(
                             fontSize: 9,
                             fontWeight: FontWeight.w500,

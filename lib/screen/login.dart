@@ -36,7 +36,7 @@ class _loginState extends State<login> {
               icon: Icon(
                 Icons.arrow_back_rounded,
                 color: Colors.white,
-                size: 34,
+                size: 30,
               ),
             ),
           ],

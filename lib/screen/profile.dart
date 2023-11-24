@@ -66,7 +66,7 @@ class _profileState extends State<profile> {
               icon: Icon(
                 Icons.arrow_back_rounded,
                 color: Colors.white,
-                size: 34,
+                size: 30,
               ),
             ),
             Text(
@@ -343,13 +343,15 @@ class listPlaylist_user extends StatelessWidget {
                                     .existsSync() // Check if it's a local file
                                 ? Image.file(
                                     File(initialPlaylist.image),
-                                    width: 100,
-                                    height: 100,
+                                    width: 60,
+                                    height: 60,
+                                    fit: BoxFit.cover,
                                   )
                                 : Image.network(
                                     initialPlaylist.image,
-                                    width: 100,
-                                    height: 100,
+                                    width: 60,
+                                    height: 60,
+                                    fit: BoxFit.cover,
                                   )
                             : SizedBox
                                 .shrink(), // An empty container, you can use other widgets like Container() if needed

@@ -34,7 +34,7 @@ class _playlistScreenState extends State<playlistScreen> {
                 icon: Icon(
                   Icons.arrow_back_rounded,
                   color: Colors.white,
-                  size: 34,
+                  size: 30,
                 ),
               ),
               Text(

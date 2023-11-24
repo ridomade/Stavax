@@ -9,6 +9,7 @@ import 'package:stavax_new/screen/login.dart';
 import 'package:stavax_new/screen/loginAndSignUp.dart';
 import 'package:stavax_new/screen/profile.dart';
 import 'package:stavax_new/screen/signUp.dart';
+import 'package:stavax_new/screen/uploadSong.dart';
 import '../screen/home.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
