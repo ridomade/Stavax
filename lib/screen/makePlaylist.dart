@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:stavax_new/model/uploadToFirebase.dart';
@@ -90,8 +92,8 @@ class _makePlaylistState extends State<makePlaylist> {
         "descPlaylist": descPlaylist.text,
         "imageUrl": imageUrl,
         "imageName": fileName,
-        //add your data that you want to upload
       });
+      print("berhasil buat playlist");
     } catch (e) {
       print('Error copying file: $e');
     }
@@ -115,8 +117,6 @@ class _makePlaylistState extends State<makePlaylist> {
       // Copy the File
       try {
         await imageFile.copy(localImage.path);
-        print("ini filename ${imageFileName}");
-        print("ini filepath ${filepath}");
         setState(() {
           fileName = imageFileName;
           filePath = filepath;
@@ -227,8 +227,9 @@ class _makePlaylistState extends State<makePlaylist> {
               height: 22,
             ),
             InkWell(
-              onTap: () {
-                getImage();
+              onTap: () async {
+                await getImage();
+                print("selected image : ${selectedImage}");
               },
               child: selectedImage != null
                   ? Container(
@@ -288,7 +289,6 @@ class _makePlaylistState extends State<makePlaylist> {
                         imageUrll: await imageUrl,
                         // imageNameInStorages : imageNameInStorage,
                       );
-                  print(imageUrl);
                   Navigator.pop(context);
                 },
                 child: Container(

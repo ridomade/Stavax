@@ -49,8 +49,6 @@ class _HomeState extends State<Home> {
         setState(() {
           userName = event['userName'];
         });
-        // userName = event['userName'];
-        print("$source data: ${event['userName']}");
       },
       onError: (error) => print("Listen failed: $error"),
     );
