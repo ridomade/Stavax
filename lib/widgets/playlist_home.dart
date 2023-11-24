@@ -42,11 +42,13 @@ class playlist_home extends StatelessWidget {
                           File(iniplaylist.image),
                           width: 100,
                           height: 100,
+                          fit: BoxFit.cover,
                         )
                       : Image.network(
                           iniplaylist.image,
                           width: 100,
                           height: 100,
+                          fit: BoxFit.cover,
                         )
                   : SizedBox
                       .shrink(), // An empty container, you can use other widgets like Container() if needed

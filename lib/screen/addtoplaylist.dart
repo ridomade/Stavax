@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stavax_new/provider/classUser.dart';
@@ -38,7 +40,7 @@ class _addToPlaylistState extends State<addToPlaylist> {
               icon: Icon(
                 Icons.arrow_back_rounded,
                 color: Colors.white,
-                size: 34,
+                size: 30,
               ),
             ),
             Text(
@@ -201,13 +203,29 @@ class _searchSongResultState extends State<searchSongResult> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      ClipRRect(
-                        child: Image.asset(
-                          widget.iniListLagu.image,
-                          height: 60,
-                          width: 60,
-                        ),
-                        borderRadius: BorderRadius.all(Radius.circular(5)),
+                      Container(
+                        alignment: Alignment.topCenter,
+                        child: widget.iniListLagu.image != null
+                            ? File(widget.iniListLagu.image)
+                                    .existsSync() // Check if it's a local file
+                                ? Image.file(
+                                    File(widget.iniListLagu.image),
+                                    width: 56,
+                                    height: 56,
+                                  )
+                                : widget.iniListLagu.image.startsWith(
+                                        'assets/') // Check if it's an asset
+                                    ? Image.asset(
+                                        widget.iniListLagu.image,
+                                        width: 56,
+                                        height: 56,
+                                      )
+                                    : Image.network(
+                                        widget.iniListLagu.image,
+                                        width: 56,
+                                        height: 56,
+                                      )
+                            : SizedBox.shrink(),
                       ),
                       SizedBox(
                         width: 11.81,

@@ -15,7 +15,9 @@ class Songs extends ChangeNotifier {
       required this.song});
 }
 
-List<Songs> songArr = [
+List<Songs> songArr = [];
+
+List<Songs> songArrs = [
   Songs(
     id: "1",
     title: "Flaming Hot Cheetos",

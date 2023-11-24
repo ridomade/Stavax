@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -114,15 +116,15 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
           icon: Icon(
             Icons.arrow_back_rounded,
             color: Colors.white,
-            size: 34,
+            size: 30,
           ),
         ),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.more_horiz),
-          ),
-        ],
+        // actions: [
+        //   IconButton(
+        //     onPressed: () {},
+        //     icon: const Icon(Icons.more_horiz),
+        //   ),
+        // ],
       ),
       body: Container(
         padding: const EdgeInsets.only(top: 20, left: 30, right: 30),
@@ -206,14 +208,40 @@ class MediaMetadata extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(10),
-          child: Image.asset(
-            imageUrl,
-            height: 300,
-            width: 300,
-          ),
+        child: Container(
+          alignment: Alignment.topCenter,
+          child: imageUrl != null
+              ? File(imageUrl).existsSync() // Check if it's a local file
+                  ? Image.file(
+                      File(imageUrl),
+                      width: 300,
+                      height: 300,
+                      fit: BoxFit.cover,
+                    )
+                  : imageUrl.startsWith('assets/') // Check if it's an asset
+                      ? Image.asset(
+                          imageUrl,
+                          width: 300,
+                          height: 300,
+                          fit: BoxFit.cover,
+                        )
+                      : Image.network(
+                          imageUrl,
+                          width: 300,
+                          height: 300,
+                          fit: BoxFit.cover,
+                        )
+              : SizedBox.shrink(),
         ),
+
+        // ClipRRect(
+        //   borderRadius: BorderRadius.circular(10),
+        //   child: Image.asset(
+        //     imageUrl,
+        //     height: 300,
+        //     width: 300,
+        //   ),
+        // ),
       ),
       const SizedBox(
         height: 8,

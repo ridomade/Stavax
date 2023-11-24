@@ -39,7 +39,7 @@ class _signUpUserState extends State<singUp> {
               icon: const Icon(
                 Icons.arrow_back_rounded,
                 color: Colors.white,
-                size: 34,
+                size: 30,
               ),
             ),
           ],

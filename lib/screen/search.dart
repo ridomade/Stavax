@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import '../constants/colors.dart';
 import '../provider/classSong.dart';
@@ -35,7 +37,7 @@ class _search_songState extends State<search_song> {
               icon: Icon(
                 Icons.arrow_back_rounded,
                 color: Colors.white,
-                size: 34,
+                size: 30,
               ),
             ),
             Text(
@@ -160,14 +162,41 @@ class songSearchResult extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      ClipRRect(
-                        child: Image.asset(
-                          iniListLagu.image,
-                          height: 60,
-                          width: 60,
-                        ),
-                        borderRadius: BorderRadius.all(Radius.circular(5)),
+                      Container(
+                        alignment: Alignment.topCenter,
+                        child: iniListLagu.image != null
+                            ? File(iniListLagu.image)
+                                    .existsSync() // Check if it's a local file
+                                ? Image.file(
+                                    File(iniListLagu.image),
+                                    width: 60,
+                                    height: 60,
+                                    fit: BoxFit.cover,
+                                  )
+                                : iniListLagu.image.startsWith(
+                                        'assets/') // Check if it's an asset
+                                    ? Image.asset(
+                                        iniListLagu.image,
+                                        width: 60,
+                                        height: 60,
+                                        fit: BoxFit.cover,
+                                      )
+                                    : Image.network(
+                                        iniListLagu.image,
+                                        width: 60,
+                                        height: 60,
+                                        fit: BoxFit.cover,
+                                      )
+                            : SizedBox.shrink(),
                       ),
+                      // ClipRRect(
+                      //   child: Image.asset(
+                      //     iniListLagu.image,
+                      //     height: 60,
+                      //     width: 60,
+                      //   ),
+                      //   borderRadius: BorderRadius.all(Radius.circular(5)),
+                      // ),
                       SizedBox(
                         width: 11.81,
                       ),

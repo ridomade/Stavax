@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
@@ -290,18 +292,18 @@ class _RecentlyPlayedHomeState extends State<RecentlyPlayedHome> {
       children: [
         InkWell(
           onTap: () {
-            // Navigator.push(
-            //   context,
-            //   MaterialPageRoute(builder: (context) {
-            //     return AudioPlayerScreen(
-            //       listSong: songArr,
-            //       song: songArr[widget.currIdx], // Use widget.currIdx here
-            //       CurrIdx: widget.currIdx,
-            //     );
-            //   }),
-            // );
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) {
+                return AudioPlayerScreen(
+                  listSong: songArr,
+                  song: songArr[widget.currIdx], // Use widget.currIdx here
+                  CurrIdx: widget.currIdx,
+                );
+              }),
+            );
 
-            displayPersistentBottomSheet();
+            // displayPersistentBottomSheet();
           },
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 14, vertical: 11),
@@ -314,11 +316,39 @@ class _RecentlyPlayedHomeState extends State<RecentlyPlayedHome> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Image.asset(
-                  widget.inirecent.image,
-                  height: 56,
-                  width: 56,
+                Container(
+                  alignment: Alignment.topCenter,
+                  child: widget.inirecent.image != null
+                      ? File(widget.inirecent.image)
+                              .existsSync() // Check if it's a local file
+                          ? Image.file(
+                              File(widget.inirecent.image),
+                              width: 56,
+                              height: 56,
+                              fit: BoxFit.cover,
+                            )
+                          : widget.inirecent.image.startsWith(
+                                  'assets/') // Check if it's an asset
+                              ? Image.asset(
+                                  widget.inirecent.image,
+                                  width: 56,
+                                  height: 56,
+                                  fit: BoxFit.cover,
+                                )
+                              : Image.network(
+                                  widget.inirecent.image,
+                                  width: 56,
+                                  height: 56,
+                                  fit: BoxFit.cover,
+                                )
+                      : SizedBox.shrink(),
                 ),
+
+                // Image.asset(
+                //   widget.inirecent.image,
+                //   height: 56,
+                //   width: 56,
+                // ),
                 SizedBox(
                   width: 11,
                 ),
@@ -358,14 +388,14 @@ class _RecentlyPlayedHomeState extends State<RecentlyPlayedHome> {
     );
   }
 
-  void displayPersistentBottomSheet() {
-    Scaffold.of(context).showBottomSheet<void>((BuildContext context) {
-      return PersistentBottomSheetContent(
-          listSong: songArr,
-          song: songArr[widget.currIdx],
-          CurrIdx: widget.currIdx);
-    });
-  }
+  // void displayPersistentBottomSheet() {
+  //   Scaffold.of(context).showBottomSheet<void>((BuildContext context) {
+  //     return PersistentBottomSheetContent(
+  //         listSong: songArr,
+  //         song: songArr[widget.currIdx],
+  //         CurrIdx: widget.currIdx);
+  //   });
+  // }
 }
 
 class PositionData {
@@ -513,12 +543,34 @@ class MediaMetadata extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(10),
-          child: Image.asset(
-            imageUrl,
-          ),
+        child: Container(
+          alignment: Alignment.topCenter,
+          child: imageUrl != null
+              ? File(imageUrl).existsSync() // Check if it's a local file
+                  ? Image.file(
+                      File(imageUrl),
+                      width: 56,
+                      height: 56,
+                    )
+                  : imageUrl.startsWith('assets/') // Check if it's an asset
+                      ? Image.asset(
+                          imageUrl,
+                          width: 56,
+                          height: 56,
+                        )
+                      : Image.network(
+                          imageUrl,
+                          width: 56,
+                          height: 56,
+                        )
+              : SizedBox.shrink(),
         ),
+        // ClipRRect(
+        //   borderRadius: BorderRadius.circular(10),
+        //   child: Image.asset(
+        //     imageUrl,
+        //   ),
+        // ),
       ),
       const SizedBox(
         width: 8,

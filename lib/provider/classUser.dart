@@ -23,6 +23,7 @@ class UsersProvider extends ChangeNotifier {
   bool artistRole;
   bool listenerRole;
   List<Playlist> playListArr = [];
+  List<Songs> songArtist = [];
 
   UsersProvider({
     this.id = "",
@@ -142,5 +143,48 @@ class UsersProvider extends ChangeNotifier {
   void hapusLagukePlaylist({required Playlist playlist, required Songs song}) {
     playlist.songList.remove(song);
     notifyListeners();
+  }
+
+  void uploadSong({
+    required String title,
+    required String artist,
+    required File? image,
+    required String? selectedImageFileName,
+    required String song,
+  }) async {
+    final uuid = Uuid();
+    if (title.isNotEmpty && image != null && selectedImageFileName != null) {
+      // Mendapatkan direktori dokumen aplikasi
+      final appDocDir = await getApplicationDocumentsDirectory();
+      final imageFileName =
+          selectedImageFileName; // Menggunakan nama file yang terpilih
+      final localImage = File("${appDocDir.path}/$imageFileName");
+      // Mengecek apakah file lokal ada
+      if (await localImage.exists()) {
+        final uniqueId = uuid.v4();
+        // File lokal ada, Anda bisa menggunakan localImage untuk mengaksesnya
+        // Tambahkan playlist baru dengan path gambar lokal
+        songArr.add(Songs(
+          id: uniqueId.toString(),
+          title: title,
+          artist: artist,
+          image: localImage.path,
+          song: song,
+        ));
+        songArtist.add(Songs(
+          id: uniqueId.toString(),
+          title: title,
+          artist: artist,
+          image: localImage.path,
+          song: song,
+        ));
+        notifyListeners();
+        // Bersihkan input setelah menambah playlist baru
+        // Lakukan tindakan lain setelah berhasil menambahkan playlist
+      } else {
+        // File lokal tidak ditemukan, Anda perlu menanganinya sesuai kebutuhan Anda
+        print('File lokal tidak ditemukan.');
+      }
+    }
   }
 }
