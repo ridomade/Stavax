@@ -28,40 +28,7 @@ class _makePlaylistState extends State<makePlaylist> {
   var filePath;
   var fileName;
   File? selectedImage;
-  String?
-      selectedImageFileName; // Tambahkan variabel untuk nama file gambar terpilih
-  // Future<void> getImage() async {
-  //   final imagePicker = ImagePicker();
-  //   final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
-  //   if (pickedFile != null) {
-  //     Directory appDocDir = await getApplicationDocumentsDirectory();
-  //     final imageFileName = pickedFile.name;
-  //     final imageFile = File(pickedFile.path);
-  //     final localImage = File('${appDocDir.path}/$imageFileName');
-  //     String filepath = imageFile.path;
-  //     String target = filepath.substring(filepath.lastIndexOf('/') + 1);
-  //     // final imageref = FirebaseStorage.instance.ref().child('Playlist/$target');
-  //     // File file = File(filepath);
-  //     try {
-  //       // await imageFile.copy(localImage.path);
-  //       // await imageref.putFile(
-  //       //     file,
-  //       //     SettableMetadata(
-  //       //       contentType: 'image/jpeg',
-  //       //     ));
-  //       // imageUrl = await imageref.getDownloadURL();
-  //       print("ini filename ${target}");
-  //       print("ini filepath ${filepath}");
-  //       setState(() {
-  //         fileName = target;
-  //         filePath = filepath;
-  //         selectedImage = localImage;
-  //         selectedImageFileName = imageFileName;
-  //       });
-  //     } catch (e) {
-  //       print('Error copying file: $e');
-  //     }
-  //   }
+  String? selectedImageFileName;
   // }
 
   final FirebaseStorage firebaseStorage = FirebaseStorage.instance;

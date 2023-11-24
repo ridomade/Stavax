@@ -7,6 +7,11 @@ import 'package:provider/provider.dart';
 import 'package:stavax_new/constants/colors.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:stavax_new/provider/classUser.dart';
+import 'package:uuid/uuid.dart';
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class uploadSong extends StatefulWidget {
   const uploadSong({super.key});
@@ -16,8 +21,72 @@ class uploadSong extends StatefulWidget {
 }
 
 class _uploadSongState extends State<uploadSong> {
-  String? _songPath;
-  String? _songFileName;
+  var _songPath;
+  var _songFileName;
+  var _imageFileName;
+  var _imagePath;
+  var artisName;
+  final FirebaseStorage firebaseStorage = FirebaseStorage.instance;
+  var imageUrl;
+  var songUrl;
+
+  @override
+  void initState() {
+    getUser();
+    super.initState();
+  }
+
+  final db = FirebaseFirestore.instance;
+  void getUser() {
+    final docRef =
+        db.collection("Users").doc(FirebaseAuth.instance.currentUser!.uid);
+    docRef.snapshots().listen(
+      (event) {
+        final source = (event.metadata.hasPendingWrites) ? "Local" : "Server";
+
+        setState(() {
+          artisName = event['userName'];
+        });
+      },
+      onError: (error) => print("Listen failed: $error"),
+    );
+  }
+
+  Future<void> uplaodSongFile(String fileName, String filePath) async {
+    File file = File(filePath);
+    final uuid = Uuid();
+    final uniqueId = uuid.v4();
+    fileName = uniqueId.toString() + fileName;
+    final songref = firebaseStorage.ref('Song/Songs/$fileName');
+    try {
+      await songref.putFile(
+          file,
+          SettableMetadata(
+            contentType: 'mp3',
+          ));
+      songUrl = await songref.getDownloadURL();
+    } catch (e) {
+      print('Error copying file: $e');
+    }
+  }
+
+  Future<void> uplaodImageFile(String fileName, String filePath) async {
+    File file = File(filePath);
+    final uuid = Uuid();
+    final uniqueId = uuid.v4();
+    fileName = uniqueId.toString() + fileName;
+    final imageref = firebaseStorage.ref('Song/Images/$fileName');
+    try {
+      await imageref.putFile(
+          file,
+          SettableMetadata(
+            contentType: 'image/jpeg',
+          ));
+      imageUrl = await imageref.getDownloadURL();
+    } catch (e) {
+      print('Error copying file: $e');
+    }
+  }
 
   Future<void> getSong() async {
     final filePickerResult = await FilePicker.platform.pickFiles(
@@ -55,6 +124,8 @@ class _uploadSongState extends State<uploadSong> {
         setState(() {
           selectedImage = localImage;
           selectedImageFileName = imageFileName;
+          _imageFileName = imageFileName;
+          _imagePath = pickedFile.path;
         });
       } catch (e) {
         print('Error copying file: $e');
@@ -268,12 +339,23 @@ class _uploadSongState extends State<uploadSong> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 InkWell(
-                  onTap: () {
+                  onTap: () async {
+                    await uplaodImageFile(_imageFileName, _imagePath);
+                    await uplaodSongFile(_songFileName, _songPath);
+                    print(artisName);
+                    await FirebaseFirestore.instance.collection('Songs').add({
+                      "artistName": artisName,
+                      "songTitle": songName.text,
+                      "imageUrl": imageUrl,
+                      "songUrl": songUrl,
+                    });
                     context.read<UsersProvider>().uploadSong(
                         title: songName.text,
-                        artist: "Asep",
+                        //nama yang upload
+                        artist: artisName,
                         image: selectedImage,
                         selectedImageFileName: selectedImageFileName,
+                        // download url song
                         song: _songPath.toString());
                     Navigator.pop(context);
                   },
