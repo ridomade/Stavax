@@ -179,7 +179,9 @@ class _searchSongResultState extends State<searchSongResult> {
               if (isAdded) {
                 // If isAdded is true, add the song to the playlist
                 context.read<UsersProvider>().tambahLagukePlaylist(
-                    playlist: widget.iniPlaylist, song: widget.iniListLagu);
+                    //tambah lagu
+                    playlist: widget.iniPlaylist,
+                    song: widget.iniListLagu);
               } else {
                 // If isAdded is false, remove the song from the playlist
                 context.read<UsersProvider>().hapusLagukePlaylist(

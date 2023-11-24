@@ -146,6 +146,7 @@ class _detailedPlaylistState extends State<detailedPlaylist> {
                         context,
                         MaterialPageRoute(
                           builder: (context) =>
+                              //tambah lagu
                               addToPlaylist(iniplaylist: widget.iniPlaylist),
                         ),
                       );

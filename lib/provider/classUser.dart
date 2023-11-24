@@ -113,18 +113,17 @@ class UsersProvider extends ChangeNotifier {
           if (await docSnapshot.data()["namePlaylist"] == playlist.name &&
               await docSnapshot.data()["descPlaylist"] == playlist.desc &&
               await docSnapshot.data()["imageUrl"] == playlist.imageUrl) {
-            print("tesssssssssss");
             // print("ini image url dari database");
             // print(docSnapshot.data()['imageUrl']);
             // print("ini image url dari lokal");
             // print(playlist.image);
             String deleteStorage = await docSnapshot.data()["imageName"];
-            print("test");
             final desertRef = FirebaseStorage.instance
                 .ref()
                 .child("Playlist/" + deleteStorage);
             await desertRef.delete();
             await docSnapshot.reference.delete();
+            print("Berhasil Hapus Playlist");
           }
         }
       },
