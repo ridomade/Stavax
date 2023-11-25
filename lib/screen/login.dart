@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stavax_new/constants/colors.dart';
+import 'package:stavax_new/provider/classPlaylist.dart';
+import 'package:stavax_new/provider/classSong.dart';
 import 'package:stavax_new/provider/classUser.dart';
 import 'package:stavax_new/screen/home.dart';
 import '../widgets/resuablePopUp.dart';
@@ -133,6 +135,7 @@ class _loginState extends State<login> {
                         .then((value) async {
                       showAlertDialog(context, "Login Berhasil");
 
+                      // tampilkan playlist per user
                       await FirebaseFirestore.instance
                           .collection('Users')
                           .doc(FirebaseAuth.instance.currentUser!.uid)
@@ -151,31 +154,52 @@ class _loginState extends State<login> {
                                       docSnapshot.data()['imageName'],
                                   imageUrll: docSnapshot.data()['imageUrl'],
                                 );
+                            Playlist playlist = Playlist(
+                                name: docSnapshot.data()['namePlaylist'],
+                                image: docSnapshot.data()['imageName'],
+                                desc: docSnapshot.data()['descPlaylist'],
+                                imageUrl: docSnapshot.data()['imageUrl']);
+                            Songs song = Songs(
+                                id: "d3b6a72f-2e57-4cfd-8a18-76ed283cc831",
+                                title: "2",
+                                artist: "Made Rido",
+                                image:
+                                    "https://firebasestorage.googleapis.com/v0/b/stavax-new.appspot.com/o/Song%2FImages%2F43b6f772-9d22-470a-880d-478e46c4d29cdownload.jpg?alt=media&token=a3cbaada-d1be-4245-90e3-ec62f34f32bb",
+                                song:
+                                    "https://firebasestorage.googleapis.com/v0/b/stavax-new.appspot.com/o/Song%2FSongs%2F3b9b7f27-89b8-4f23-981f-69e92599208ay2mate.com%20-%20DRUM%20ROLL%20SOUND%20EFFECT%20Awarding.mp3?alt=media&token=8c0d93cc-b809-476f-a3aa-e3744662c9e7");
+                            context.read<UsersProvider>().tambahLagukePlaylist2(
+                                //tambah lagu
+                                playlist: playlist,
+                                song: song);
+                            print(playlist.name);
+                            print(song.artist);
                           }
                         },
                         onError: (e) => print("Error completing: $e"),
                       );
 
-                      // QuerySnapshot querySnapshot = await FirebaseFirestore
-                      //     .instance
-                      //     .collection('Users')
-                      //     .doc(FirebaseAuth.instance.currentUser!.uid)
-                      //     .collection("Playlist")
-                      //     .get();
-                      // final allData =
-                      //     querySnapshot.docs.map((doc) => doc.data()).toList();
-                      // print("INi all data :");
-                      // for (var i = 0; i < allData.length; i++) {
-                      //   print(allData[i]);
-                      // }
+                      //tampilkan semua lagu yang ada
+                      await FirebaseFirestore.instance
+                          .collection('Songs')
+                          .get()
+                          .then(
+                        (querySnapshot) {
+                          for (var docSnapshot in querySnapshot.docs) {
+                            context.read<UsersProvider>().uploadSong2(
+                                  title: docSnapshot.data()['songTitle'],
+                                  //nama yang upload
+                                  artist: docSnapshot.data()['artistName'],
+                                  image: docSnapshot.data()['imageUrl'],
+                                  selectedImageFileName:
+                                      docSnapshot.data()['songTitle'],
+                                  // download url song
+                                  song: docSnapshot.data()['songUrl'],
+                                );
+                          }
+                        },
+                        onError: (e) => print("Error completing: $e"),
+                      );
 
-                      // loop read all data playlist curr user
-                      // context.read<UsersProvider>().showAllCurrUserPlaylist(
-                      //     // namePlaylist: namePlaylist.text,
-                      //     // descPlaylist: descPlaylist.text,
-                      //     // selectedImage: selectedImage,
-                      //     // selectedImageFileName: selectedImageFileName,
-                      // );
                       Navigator.push(
                         context,
                         MaterialPageRoute(
