@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:stavax_new/constants/colors.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:stavax_new/provider/classUser.dart';
+import 'package:stavax_new/widgets/resuablePopUp.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -21,10 +22,10 @@ class uploadSong extends StatefulWidget {
 }
 
 class _uploadSongState extends State<uploadSong> {
-  var _songPath;
-  var _songFileName;
-  var _imageFileName;
-  var _imagePath;
+  String? _songPath;
+  String? _songFileName;
+  String? _imageFileName;
+  String? _imagePath;
   var artisName;
   final FirebaseStorage firebaseStorage = FirebaseStorage.instance;
   var imageUrl;
@@ -340,24 +341,41 @@ class _uploadSongState extends State<uploadSong> {
               children: [
                 InkWell(
                   onTap: () async {
-                    await uplaodImageFile(_imageFileName, _imagePath);
-                    await uplaodSongFile(_songFileName, _songPath);
-                    print(artisName);
-                    await FirebaseFirestore.instance.collection('Songs').add({
-                      "artistName": artisName,
-                      "songTitle": songName.text,
-                      "imageUrl": imageUrl,
-                      "songUrl": songUrl,
-                    });
-                    context.read<UsersProvider>().uploadSong(
-                        title: songName.text,
-                        //nama yang upload
-                        artist: artisName,
-                        image: selectedImage,
-                        selectedImageFileName: selectedImageFileName,
-                        // download url song
-                        song: _songPath.toString());
-                    Navigator.pop(context);
+                    if (_imageFileName != null &&
+                        _imagePath != null &&
+                        _songFileName != null &&
+                        _songPath != null) {
+                      await uplaodImageFile(_imageFileName!, _imagePath!);
+                      await uplaodSongFile(_songFileName!, _songPath!);
+                      await FirebaseFirestore.instance.collection('Songs').add({
+                        "artistName": artisName,
+                        "songTitle": songName.text,
+                        "imageUrl": imageUrl,
+                        "songUrl": songUrl,
+                      });
+                      context.read<UsersProvider>().uploadSong(
+                          title: songName.text,
+                          //nama yang upload
+                          artist: artisName,
+                          image: selectedImage,
+                          selectedImageFileName: selectedImageFileName,
+                          // download url song
+                          song: _songPath.toString());
+                      Navigator.pop(context);
+                    } else if (_imageFileName == null &&
+                        _imagePath == null &&
+                        _songFileName != null &&
+                        _songPath != null) {
+                      showAlertDialog(context, "The Image Cannot be Empty");
+                    } else if (_songFileName == null &&
+                        _songPath == null &&
+                        _imageFileName != null &&
+                        _imagePath != null) {
+                      showAlertDialog(context, "The Song Cannot be Empty");
+                    } else {
+                      showAlertDialog(
+                          context, "The Song and Image Cannot be Empty");
+                    }
                   },
                   child: Container(
                     width: 94,

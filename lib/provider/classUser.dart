@@ -134,13 +134,64 @@ class UsersProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void tambahLagukePlaylist({required Playlist playlist, required Songs song}) {
+  Future<void> tambahLagukePlaylist(
+      {required Playlist playlist, required Songs song}) async {
+    playlist.songList.add(song);
+    var path;
+    var songReference =
+        FirebaseFirestore.instance.collection("Songs").doc(path);
+    var db = FirebaseFirestore.instance;
+
+    //mencari letak collection lagu yang akan ditambah
+
+    await db.collection("Songs").get().then((querySnapshot) async {
+      for (var docSnapshot in querySnapshot.docs) {
+        if (await docSnapshot.data()["artistName"] == song.artist &&
+            await docSnapshot.data()["imageUrl"] == song.image &&
+            await docSnapshot.data()["songUrl"] == song.song) {
+          path = (docSnapshot.id);
+        }
+      }
+    });
+    //tambah kedalam array song pada class Users/Playlist
+    db
+        .collection("Users")
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection("Playlist")
+        .get()
+        .then(
+      (querySnapshot) async {
+        for (var docSnapshot in querySnapshot.docs) {
+          if (await docSnapshot.data()["namePlaylist"] == playlist.name &&
+              await docSnapshot.data()["descPlaylist"] == playlist.desc &&
+              await docSnapshot.data()["imageUrl"] == playlist.imageUrl) {
+            db
+                .collection("Users")
+                .doc(FirebaseAuth.instance.currentUser!.uid)
+                .collection("Playlist")
+                .doc(docSnapshot.id.toString())
+                .update({
+              "song": FieldValue.arrayUnion([songReference]),
+            });
+          }
+        }
+      },
+      onError: (e) => print("Error completing: $e"),
+    );
+
+    notifyListeners();
+  }
+
+  void tambahLagukePlaylist2(
+      {required Playlist playlist, required Songs song}) {
+    print("asokkk");
     playlist.songList.add(song);
     notifyListeners();
   }
 
   void hapusLagukePlaylist({required Playlist playlist, required Songs song}) {
     playlist.songList.remove(song);
+
     notifyListeners();
   }
 
@@ -184,6 +235,34 @@ class UsersProvider extends ChangeNotifier {
         // File lokal tidak ditemukan, Anda perlu menanganinya sesuai kebutuhan Anda
         print('File lokal tidak ditemukan.');
       }
+    }
+  }
+
+  void uploadSong2({
+    required String title,
+    required String artist,
+    required String image,
+    required String selectedImageFileName,
+    required String song,
+  }) async {
+    final uuid = Uuid();
+    if (title.isNotEmpty && image != null && selectedImageFileName != null) {
+      final uniqueId = uuid.v4();
+      songArr.add(Songs(
+        id: uniqueId.toString(),
+        title: title,
+        artist: artist,
+        image: image,
+        song: song,
+      ));
+      songArtist.add(Songs(
+        id: uniqueId.toString(),
+        title: title,
+        artist: artist,
+        image: image,
+        song: song,
+      ));
+      notifyListeners();
     }
   }
 }

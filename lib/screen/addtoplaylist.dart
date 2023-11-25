@@ -9,6 +9,8 @@ import '../screen/musicplayer.dart';
 import '../provider/classPlaylist.dart';
 
 List<Songs> filteredSongs = songArr;
+List<Playlist> playlistParam = [];
+List<Songs> songParam = [];
 
 class addToPlaylist extends StatefulWidget {
   final Playlist iniplaylist;
@@ -82,6 +84,14 @@ class _addToPlaylistState extends State<addToPlaylist> {
                 child: InkWell(
                   onTap: () {
                     Navigator.pop(context);
+                    if (playlistParam.isNotEmpty && songParam.isNotEmpty) {
+                      for (int i = 0; i < playlistParam.length; i++) {
+                        context.read<UsersProvider>().tambahLagukePlaylist(
+                            playlist: playlistParam[i], song: songParam[i]);
+                      }
+                    }
+                    playlistParam.clear();
+                    songParam.clear();
                   },
                   child: Container(
                       margin: EdgeInsets.all(13),
@@ -176,18 +186,12 @@ class _searchSongResultState extends State<searchSongResult> {
           onTap: () {
             setState(() {
               isAdded = !isAdded;
-
-              // Conditionally execute different actions based on isAdded
               if (isAdded) {
-                // If isAdded is true, add the song to the playlist
-                context.read<UsersProvider>().tambahLagukePlaylist(
-                    //tambah lagu
-                    playlist: widget.iniPlaylist,
-                    song: widget.iniListLagu);
+                playlistParam.add(widget.iniPlaylist);
+                songParam.add(widget.iniListLagu);
               } else {
-                // If isAdded is false, remove the song from the playlist
-                context.read<UsersProvider>().hapusLagukePlaylist(
-                    playlist: widget.iniPlaylist, song: widget.iniListLagu);
+                playlistParam.remove(widget.iniPlaylist);
+                songParam.remove(widget.iniListLagu);
               }
             });
           },
