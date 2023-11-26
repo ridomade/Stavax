@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -36,6 +37,7 @@ class UsersProvider extends ChangeNotifier {
   });
 
   void tambahPlaylistBaru({
+    required String id,
     required String namePlaylist,
     required String descPlaylist,
     required File? selectedImage,
@@ -43,7 +45,6 @@ class UsersProvider extends ChangeNotifier {
     required String imageUrll,
     // required String imageNameInStorage,
   }) async {
-    final uuid = Uuid();
     if (namePlaylist.isNotEmpty &&
         selectedImage != null &&
         selectedImageFileName != null) {
@@ -54,11 +55,10 @@ class UsersProvider extends ChangeNotifier {
       final localImage = File("${appDocDir.path}/$imageFileName");
       // Mengecek apakah file lokal ada
       if (await localImage.exists()) {
-        final uniqueId = uuid.v4();
         // File lokal ada, Anda bisa menggunakan localImage untuk mengaksesnya
         // Tambahkan playlist baru dengan path gambar lokal
         playListArr.add(Playlist(
-          id: uniqueId.toString(), // Sesuaikan dengan kebutuhan
+          id: id, // Sesuaikan dengan kebutuhan
           name: namePlaylist, // Menggunakan value dari namePlaylist
           image: localImage.path,
           desc: descPlaylist, // Menggunakan value dari descPlaylist
@@ -76,24 +76,29 @@ class UsersProvider extends ChangeNotifier {
   }
 
   void tambahPlaylistBaru2({
+    required String id,
     required String namePlaylist,
     required String descPlaylist,
     required String selectedImage,
     required String? selectedImageFileName,
     required String imageUrll,
   }) async {
-    final uuid = Uuid();
-    final uniqueId = uuid.v4();
     if (namePlaylist.isNotEmpty &&
         selectedImage != null &&
         selectedImageFileName != null) {
       playListArr.add(Playlist(
-        id: uniqueId.toString(), // Sesuaikan dengan kebutuhan
+        id: id, // Sesuaikan dengan kebutuhan
         name: namePlaylist, // Menggunakan value dari namePlaylist
         image: selectedImage,
         desc: descPlaylist, // Menggunakan value dari descPlaylist
         imageUrl: imageUrll,
       ));
+      // print(id);
+      // print(namePlaylist);
+      // print(selectedImage);
+      // print(descPlaylist);
+      // print(imageUrll);
+
       notifyListeners();
       // Bersihkan input setelah menambah playlist baru
       // Lakukan tindakan lain setelah berhasil menambahkan playlist
@@ -114,46 +119,54 @@ class UsersProvider extends ChangeNotifier {
           if (await docSnapshot.data()["namePlaylist"] == playlist.name &&
               await docSnapshot.data()["descPlaylist"] == playlist.desc &&
               await docSnapshot.data()["imageUrl"] == playlist.imageUrl) {
-            // print("ini image url dari database");
-            // print(docSnapshot.data()['imageUrl']);
-            // print("ini image url dari lokal");
-            // print(playlist.image);
             String deleteStorage = await docSnapshot.data()["imageName"];
             final desertRef = FirebaseStorage.instance
                 .ref()
                 .child("Playlist/" + deleteStorage);
+
             await desertRef.delete();
             await docSnapshot.reference.delete();
+            print(desertRef);
+            print(docSnapshot.reference);
             print("Berhasil Hapus Playlist");
           }
         }
       },
       onError: (e) => print("Error completing: $e"),
     );
+    // print(playlist.id);
+    // print(playlist.name);
+    // print(playlist.desc);
+    // print(playlist.image);
+    // print(playlist.imageUrl);
     playListArr.remove(playlist);
     notifyListeners();
   }
 
   Future<void> tambahLagukePlaylist(
       {required Playlist playlist, required Songs song}) async {
+    // print(">>>>>>");
+    // print(playlist.id);
+    // print(playlist.name);
+    // print(playlist.image);
+    // print(playlist.desc);
+    // print(playlist.imageUrl);
+    // print(">>>>>>");
+    // print(song.id);
+    // print(song.title);
+    // print(song.artist);
+    // print(song.image);
+    // print(song.song);
+    // print(">>>>>>");
     playlist.songList.add(song);
-    var path;
+    print(playlist.songList[0].id);
+    print(playlist.songList[0].artist);
+    print(playlist.songList[0].title);
+    print(playlist.songList[0].image);
+    print(playlist.songList[0].song);
     var songReference =
-        FirebaseFirestore.instance.collection("Songs").doc(path);
+        FirebaseFirestore.instance.collection("Songs").doc(song.id);
     var db = FirebaseFirestore.instance;
-
-    //mencari letak collection lagu yang akan ditambah
-
-    await db.collection("Songs").get().then((querySnapshot) async {
-      for (var docSnapshot in querySnapshot.docs) {
-        if (await docSnapshot.data()["artistName"] == song.artist &&
-            await docSnapshot.data()["imageUrl"] == song.image &&
-            await docSnapshot.data()["songUrl"] == song.song) {
-          path = (docSnapshot.id);
-        }
-      }
-    });
-    //tambah kedalam array song pada class Users/Playlist
     db
         .collection("Users")
         .doc(FirebaseAuth.instance.currentUser!.uid)
@@ -182,17 +195,144 @@ class UsersProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void tambahLagukePlaylist2(
-      {required Playlist playlist, required Songs song}) {
-    print("asokkk");
-    playlist.songList.add(song);
+  Future<void> tambahLagukePlaylist2() async {
+    Playlist playlist = Playlist();
+    // List<Songs> listSong = [];
+    Songs song;
+    await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection("Playlist")
+        .get()
+        .then(
+      (querySnapshot) {
+        for (var docSnapshot in querySnapshot.docs) {
+          playlist.id = docSnapshot.id;
+          playlist.name = docSnapshot.data()['namePlaylist'];
+          playlist.desc = docSnapshot.data()['descPlaylist'];
+          playlist.image = docSnapshot.data()['imageUrl'];
+          playlist.imageUrl = docSnapshot.data()['imageUrl'];
+          // playlist.songList = listSong;
+        }
+      },
+      onError: (e) => print("Error completing: $e"),
+    );
+    await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection("ArtistSong")
+        .get()
+        .then(
+      (querySnapshot) async {
+        for (var docSnapshot in querySnapshot.docs) {
+          DocumentReference<Map<String, dynamic>> favoriteSongRef =
+              docSnapshot.data()["song"];
+          var adder = await favoriteSongRef.get();
+          song = Songs(
+              id: adder.id,
+              title: adder['songTitle'],
+              artist: adder['artistName'],
+              image: adder['imageUrl'],
+              song: adder['songUrl']);
+          print(">>>>>>");
+          print(playlist.id);
+          print(playlist.name);
+          print(playlist.image);
+          print(playlist.desc);
+          print(playlist.imageUrl);
+          print(playlist.songList);
+          print(">>>>>>");
+          print(song.id);
+          print(song.title);
+          print(song.artist);
+          print(song.image);
+          print(song.song);
+          print(">>>>>>");
+          playlist.songList.add(song);
+          print(playlist.songList[0].id);
+          print(playlist.songList[0].artist);
+          print(playlist.songList[0].title);
+          print(playlist.songList[0].image);
+          print(playlist.songList[0].song);
+        }
+      },
+      onError: (e) => print("Error completing: $e"),
+    );
+
     notifyListeners();
   }
 
   void hapusLagukePlaylist({required Playlist playlist, required Songs song}) {
     playlist.songList.remove(song);
-
     notifyListeners();
+  }
+
+  // void hapusLagukePlaylist2(
+  //     {required UsersProvider userProv, required Songs song}) {
+  //   song.songArtist
+  //   notifyListeners();
+  // }
+
+  Future<void> deleteSong({
+    required String id,
+    required String title,
+    required String artist,
+    required String image,
+    required String song,
+  }) async {
+    print(songArr[0].id);
+    songArr.remove(Songs(
+      id: id,
+      title: title,
+      artist: artist,
+      image: image,
+      song: song,
+    ));
+    songArtist.remove(Songs(
+      id: id,
+      title: title,
+      artist: artist,
+      image: image,
+      song: song,
+    ));
+    print(songArr[0].id);
+
+    // print(File(id));
+    // print(title);
+    // print(artist);
+    // print(image);
+    // print(song);
+    var deletedSongCollection =
+        await FirebaseFirestore.instance.collection("Songs");
+
+    var deletedArtistSongCollection = await FirebaseFirestore.instance
+        .collection("Users")
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection("ArtistSong");
+
+    deletedSongCollection.doc(id).get().then((DocumentSnapshot doc) async {
+      final data = doc.data() as Map<String, dynamic>;
+
+      await FirebaseStorage.instance
+          .ref()
+          .child("Song/Songs/" + data["songNameUrl"])
+          .delete();
+      await FirebaseStorage.instance
+          .ref()
+          .child("Song/Images/" + data["imageNameUrl"])
+          .delete();
+      await deletedSongCollection.doc(id).delete();
+      deletedArtistSongCollection
+          .where("song", isEqualTo: deletedSongCollection.doc(id))
+          .get()
+          .then((querySnapshot) async {
+        for (var docSnapshot in querySnapshot.docs) {
+          await deletedArtistSongCollection.doc(docSnapshot.id).delete();
+        }
+      });
+    });
+    notifyListeners();
+    print("berhasil Hapus Lagu");
   }
 
   void uploadSong({
@@ -201,8 +341,8 @@ class UsersProvider extends ChangeNotifier {
     required File? image,
     required String? selectedImageFileName,
     required String song,
+    required String id,
   }) async {
-    final uuid = Uuid();
     if (title.isNotEmpty && image != null && selectedImageFileName != null) {
       // Mendapatkan direktori dokumen aplikasi
       final appDocDir = await getApplicationDocumentsDirectory();
@@ -211,23 +351,28 @@ class UsersProvider extends ChangeNotifier {
       final localImage = File("${appDocDir.path}/$imageFileName");
       // Mengecek apakah file lokal ada
       if (await localImage.exists()) {
-        final uniqueId = uuid.v4();
         // File lokal ada, Anda bisa menggunakan localImage untuk mengaksesnya
         // Tambahkan playlist baru dengan path gambar lokal
         songArr.add(Songs(
-          id: uniqueId.toString(),
+          id: id,
           title: title,
           artist: artist,
           image: localImage.path,
           song: song,
         ));
         songArtist.add(Songs(
-          id: uniqueId.toString(),
+          id: id,
           title: title,
           artist: artist,
           image: localImage.path,
           song: song,
         ));
+
+        // print(id);
+        // print(title);
+        // print(artist);
+        // print(image);
+        // print(song);
         notifyListeners();
         // Bersihkan input setelah menambah playlist baru
         // Lakukan tindakan lain setelah berhasil menambahkan playlist
@@ -239,24 +384,36 @@ class UsersProvider extends ChangeNotifier {
   }
 
   void uploadSong2({
+    required String id,
     required String title,
     required String artist,
     required String image,
     required String selectedImageFileName,
     required String song,
   }) async {
-    final uuid = Uuid();
     if (title.isNotEmpty && image != null && selectedImageFileName != null) {
-      final uniqueId = uuid.v4();
       songArr.add(Songs(
-        id: uniqueId.toString(),
+        id: id,
         title: title,
         artist: artist,
         image: image,
         song: song,
       ));
+      notifyListeners();
+    }
+  }
+
+  void uploadSong3({
+    required String id,
+    required String title,
+    required String artist,
+    required String image,
+    required String selectedImageFileName,
+    required String song,
+  }) async {
+    if (title.isNotEmpty && image != null && selectedImageFileName != null) {
       songArtist.add(Songs(
-        id: uniqueId.toString(),
+        id: id,
         title: title,
         artist: artist,
         image: image,

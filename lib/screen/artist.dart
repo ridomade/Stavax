@@ -303,9 +303,18 @@ class ListSong extends StatelessWidget {
                   context: context,
                   builder: (BuildContext context) {
                     return InkWell(
-                      onTap: () {
+                      onTap: () async {
                         // Perform actions on tap
                         // e.g., call a function to remove the song
+
+                        context.read<UsersProvider>().deleteSong(
+                              id: inisong.id,
+                              title: inisong.title,
+                              artist: inisong.artist,
+                              image: inisong.image,
+                              song: inisong.song,
+                            );
+                        Navigator.pop(context);
                       },
                       child: Container(
                         padding: EdgeInsets.symmetric(horizontal: 20),

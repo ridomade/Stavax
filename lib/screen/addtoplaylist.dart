@@ -86,6 +86,20 @@ class _addToPlaylistState extends State<addToPlaylist> {
                     Navigator.pop(context);
                     if (playlistParam.isNotEmpty && songParam.isNotEmpty) {
                       for (int i = 0; i < playlistParam.length; i++) {
+                        print(">>>>>>");
+                        print(playlistParam[i].id);
+                        print(playlistParam[i].name);
+                        print(playlistParam[i].image);
+                        print(playlistParam[i].desc);
+                        print(playlistParam[i].imageUrl);
+                        print(playlistParam[i].songList);
+                        print(">>>>>>");
+                        print(songParam[i].id);
+                        print(songParam[i].title);
+                        print(songParam[i].artist);
+                        print(songParam[i].image);
+                        print(songParam[i].song);
+                        print(">>>>>>");
                         context.read<UsersProvider>().tambahLagukePlaylist(
                             playlist: playlistParam[i], song: songParam[i]);
                       }

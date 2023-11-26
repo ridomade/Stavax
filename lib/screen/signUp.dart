@@ -2,10 +2,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import 'package:stavax_new/constants/colors.dart';
 import 'package:stavax_new/model/users.dart';
 import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:stavax_new/provider/classUser.dart';
 import 'package:stavax_new/screen/home.dart';
 import '../widgets/resuablePopUp.dart';
 
@@ -207,7 +209,7 @@ class _signUpUserState extends State<singUp> {
                           .createUserWithEmailAndPassword(
                               email: _emailTextController.text.trim(),
                               password: _passwordTextController.text)
-                          .then((value) {
+                          .then((value) async {
                         final cities =
                             FirebaseFirestore.instance.collection("Users");
                         final data = <String, dynamic>{
@@ -220,6 +222,27 @@ class _signUpUserState extends State<singUp> {
                             .doc(FirebaseAuth.instance.currentUser!.uid)
                             .set(data);
                         print("Berhasil buat akun");
+                        await FirebaseFirestore.instance
+                            .collection('Songs')
+                            .get()
+                            .then(
+                          (querySnapshot) {
+                            for (var docSnapshot in querySnapshot.docs) {
+                              context.read<UsersProvider>().uploadSong2(
+                                    id: docSnapshot.id,
+                                    title: docSnapshot.data()['songTitle'],
+                                    //nama yang upload
+                                    artist: docSnapshot.data()['artistName'],
+                                    image: docSnapshot.data()['imageUrl'],
+                                    selectedImageFileName:
+                                        docSnapshot.data()['songTitle'],
+                                    // download url song
+                                    song: docSnapshot.data()['songUrl'],
+                                  );
+                            }
+                          },
+                          onError: (e) => print("Error completing: $e"),
+                        );
                         Navigator.push(
                           context,
                           MaterialPageRoute(

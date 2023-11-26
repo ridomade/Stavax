@@ -30,7 +30,7 @@ class _uploadSongState extends State<uploadSong> {
   final FirebaseStorage firebaseStorage = FirebaseStorage.instance;
   var imageUrl;
   var songUrl;
-
+  var docId;
   @override
   void initState() {
     getUser();
@@ -53,6 +53,8 @@ class _uploadSongState extends State<uploadSong> {
     );
   }
 
+  var imageNameUrl;
+  var songNameUrl;
   Future<void> uplaodSongFile(String fileName, String filePath) async {
     File file = File(filePath);
     final uuid = Uuid();
@@ -66,6 +68,9 @@ class _uploadSongState extends State<uploadSong> {
             contentType: 'mp3',
           ));
       songUrl = await songref.getDownloadURL();
+      setState(() {
+        songNameUrl = fileName;
+      });
     } catch (e) {
       print('Error copying file: $e');
     }
@@ -84,6 +89,9 @@ class _uploadSongState extends State<uploadSong> {
             contentType: 'image/jpeg',
           ));
       imageUrl = await imageref.getDownloadURL();
+      setState(() {
+        imageNameUrl = fileName;
+      });
     } catch (e) {
       print('Error copying file: $e');
     }
@@ -350,10 +358,26 @@ class _uploadSongState extends State<uploadSong> {
                       await FirebaseFirestore.instance.collection('Songs').add({
                         "artistName": artisName,
                         "songTitle": songName.text,
+                        "imageNameUrl": imageNameUrl,
                         "imageUrl": imageUrl,
+                        "songNameUrl": songNameUrl,
                         "songUrl": songUrl,
+                      }).then((document) {
+                        setState(() {
+                          docId = document.id;
+                        });
                       });
+                      var songReference = FirebaseFirestore.instance
+                          .collection("Songs")
+                          .doc(docId);
+                      await FirebaseFirestore.instance
+                          .collection('Users')
+                          .doc(FirebaseAuth.instance.currentUser!.uid)
+                          .collection("ArtistSong")
+                          .add({"song": songReference});
+
                       context.read<UsersProvider>().uploadSong(
+                          id: docId,
                           title: songName.text,
                           //nama yang upload
                           artist: artisName,
