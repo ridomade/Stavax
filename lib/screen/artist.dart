@@ -307,12 +307,9 @@ class ListSong extends StatelessWidget {
                         // Perform actions on tap
                         // e.g., call a function to remove the song
 
-                        context.read<UsersProvider>().deleteSong(
-                              id: inisong.id,
-                              title: inisong.title,
-                              artist: inisong.artist,
-                              image: inisong.image,
-                              song: inisong.song,
+                        context.read<UsersProvider>().hapusLaguArtist(
+                              user: iniuser,
+                              song: inisong,
                             );
                         Navigator.pop(context);
                       },

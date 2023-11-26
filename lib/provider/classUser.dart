@@ -159,11 +159,6 @@ class UsersProvider extends ChangeNotifier {
     // print(song.song);
     // print(">>>>>>");
     playlist.songList.add(song);
-    print(playlist.songList[0].id);
-    print(playlist.songList[0].artist);
-    print(playlist.songList[0].title);
-    print(playlist.songList[0].image);
-    print(playlist.songList[0].song);
     var songReference =
         FirebaseFirestore.instance.collection("Songs").doc(song.id);
     var db = FirebaseFirestore.instance;
@@ -267,41 +262,8 @@ class UsersProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // void hapusLagukePlaylist2(
-  //     {required UsersProvider userProv, required Songs song}) {
-  //   song.songArtist
-  //   notifyListeners();
-  // }
-
-  Future<void> deleteSong({
-    required String id,
-    required String title,
-    required String artist,
-    required String image,
-    required String song,
-  }) async {
-    print(songArr[0].id);
-    songArr.remove(Songs(
-      id: id,
-      title: title,
-      artist: artist,
-      image: image,
-      song: song,
-    ));
-    songArtist.remove(Songs(
-      id: id,
-      title: title,
-      artist: artist,
-      image: image,
-      song: song,
-    ));
-    print(songArr[0].id);
-
-    // print(File(id));
-    // print(title);
-    // print(artist);
-    // print(image);
-    // print(song);
+  Future<void> hapusLaguArtist(
+      {required UsersProvider user, required Songs song}) async {
     var deletedSongCollection =
         await FirebaseFirestore.instance.collection("Songs");
 
@@ -310,7 +272,7 @@ class UsersProvider extends ChangeNotifier {
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .collection("ArtistSong");
 
-    deletedSongCollection.doc(id).get().then((DocumentSnapshot doc) async {
+    deletedSongCollection.doc(song.id).get().then((DocumentSnapshot doc) async {
       final data = doc.data() as Map<String, dynamic>;
 
       await FirebaseStorage.instance
@@ -321,9 +283,9 @@ class UsersProvider extends ChangeNotifier {
           .ref()
           .child("Song/Images/" + data["imageNameUrl"])
           .delete();
-      await deletedSongCollection.doc(id).delete();
+      await deletedSongCollection.doc(song.id).delete();
       deletedArtistSongCollection
-          .where("song", isEqualTo: deletedSongCollection.doc(id))
+          .where("song", isEqualTo: deletedSongCollection.doc(song.id))
           .get()
           .then((querySnapshot) async {
         for (var docSnapshot in querySnapshot.docs) {
@@ -331,9 +293,72 @@ class UsersProvider extends ChangeNotifier {
         }
       });
     });
+    user.songArtist.remove(song);
+    songArr.remove(song);
     notifyListeners();
-    print("berhasil Hapus Lagu");
   }
+
+  // Future<void> deleteSong({
+  //   required String id,
+  //   required String title,
+  //   required String artist,
+  //   required String image,
+  //   required String song,
+  // }) async {
+  //   print(songArr[0].id);
+  //   songArr.remove(Songs(
+  //     id: id,
+  //     title: title,
+  //     artist: artist,
+  //     image: image,
+  //     song: song,
+  //   ));
+  //   songArtist.remove(Songs(
+  //     id: id,
+  //     title: title,
+  //     artist: artist,
+  //     image: image,
+  //     song: song,
+  //   ));
+  //   print(songArr[0].id);
+
+  //   // print(File(id));
+  //   // print(title);
+  //   // print(artist);
+  //   // print(image);
+  //   // print(song);
+  //   var deletedSongCollection =
+  //       await FirebaseFirestore.instance.collection("Songs");
+
+  //   var deletedArtistSongCollection = await FirebaseFirestore.instance
+  //       .collection("Users")
+  //       .doc(FirebaseAuth.instance.currentUser!.uid)
+  //       .collection("ArtistSong");
+
+  //   deletedSongCollection.doc(id).get().then((DocumentSnapshot doc) async {
+  //     final data = doc.data() as Map<String, dynamic>;
+
+  //     await FirebaseStorage.instance
+  //         .ref()
+  //         .child("Song/Songs/" + data["songNameUrl"])
+  //         .delete();
+  //     await FirebaseStorage.instance
+  //         .ref()
+  //         .child("Song/Images/" + data["imageNameUrl"])
+  //         .delete();
+  //     await deletedSongCollection.doc(id).delete();
+  //     deletedArtistSongCollection
+  //         .where("song", isEqualTo: deletedSongCollection.doc(id))
+  //         .get()
+  //         .then((querySnapshot) async {
+  //       for (var docSnapshot in querySnapshot.docs) {
+  //         await deletedArtistSongCollection.doc(docSnapshot.id).delete();
+  //       }
+  //     });
+  //   });
+  //   notifyListeners();
+  //   print("berhasil Hapus Lagu");
+  // }
 
   void uploadSong({
     required String title,
