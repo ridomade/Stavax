@@ -128,6 +128,8 @@ class _loginState extends State<login> {
                 ),
                 InkWell(
                   onTap: () async {
+                    //tampilkan semua lagu dalam playlist
+                    await context.read<UsersProvider>().tambahLagukePlaylist2();
                     FirebaseAuth.instance
                         .signInWithEmailAndPassword(
                             email: _emailTextController.text.trim(),
@@ -145,6 +147,7 @@ class _loginState extends State<login> {
                         (querySnapshot) {
                           for (var docSnapshot in querySnapshot.docs) {
                             context.read<UsersProvider>().tambahPlaylistBaru2(
+                                  id: docSnapshot.id,
                                   namePlaylist:
                                       docSnapshot.data()['namePlaylist'],
                                   descPlaylist:
@@ -154,30 +157,37 @@ class _loginState extends State<login> {
                                       docSnapshot.data()['imageName'],
                                   imageUrll: docSnapshot.data()['imageUrl'],
                                 );
-                            Playlist playlist = Playlist(
-                                name: docSnapshot.data()['namePlaylist'],
-                                image: docSnapshot.data()['imageName'],
-                                desc: docSnapshot.data()['descPlaylist'],
-                                imageUrl: docSnapshot.data()['imageUrl']);
-                            Songs song = Songs(
-                                id: "d3b6a72f-2e57-4cfd-8a18-76ed283cc831",
-                                title: "2",
-                                artist: "Made Rido",
-                                image:
-                                    "https://firebasestorage.googleapis.com/v0/b/stavax-new.appspot.com/o/Song%2FImages%2F43b6f772-9d22-470a-880d-478e46c4d29cdownload.jpg?alt=media&token=a3cbaada-d1be-4245-90e3-ec62f34f32bb",
-                                song:
-                                    "https://firebasestorage.googleapis.com/v0/b/stavax-new.appspot.com/o/Song%2FSongs%2F3b9b7f27-89b8-4f23-981f-69e92599208ay2mate.com%20-%20DRUM%20ROLL%20SOUND%20EFFECT%20Awarding.mp3?alt=media&token=8c0d93cc-b809-476f-a3aa-e3744662c9e7");
-                            context.read<UsersProvider>().tambahLagukePlaylist2(
-                                //tambah lagu
-                                playlist: playlist,
-                                song: song);
-                            print(playlist.name);
-                            print(song.artist);
                           }
                         },
                         onError: (e) => print("Error completing: $e"),
                       );
 
+                      // tampikan semua lagu milik artis
+                      await FirebaseFirestore.instance
+                          .collection('Users')
+                          .doc(FirebaseAuth.instance.currentUser!.uid)
+                          .collection("ArtistSong")
+                          .get()
+                          .then(
+                        (querySnapshot) async {
+                          for (var docSnapshot in querySnapshot.docs) {
+                            DocumentReference<Map<String, dynamic>>
+                                favoriteSongRef = docSnapshot.data()["song"];
+                            var adder = await favoriteSongRef.get();
+                            context.read<UsersProvider>().uploadSong3(
+                                  id: adder.id,
+                                  title: adder['songTitle'],
+                                  //nama yang upload
+                                  artist: adder['artistName'],
+                                  image: adder['imageUrl'],
+                                  selectedImageFileName: adder['songTitle'],
+                                  // download url song
+                                  song: adder['songUrl'],
+                                );
+                          }
+                        },
+                        onError: (e) => print("Error completing: $e"),
+                      );
                       //tampilkan semua lagu yang ada
                       await FirebaseFirestore.instance
                           .collection('Songs')
@@ -186,6 +196,7 @@ class _loginState extends State<login> {
                         (querySnapshot) {
                           for (var docSnapshot in querySnapshot.docs) {
                             context.read<UsersProvider>().uploadSong2(
+                                  id: docSnapshot.id,
                                   title: docSnapshot.data()['songTitle'],
                                   //nama yang upload
                                   artist: docSnapshot.data()['artistName'],

@@ -29,6 +29,7 @@ class _makePlaylistState extends State<makePlaylist> {
   var fileName;
   File? selectedImage;
   String? selectedImageFileName;
+  var docId;
   // }
 
   final FirebaseStorage firebaseStorage = FirebaseStorage.instance;
@@ -59,7 +60,12 @@ class _makePlaylistState extends State<makePlaylist> {
         "descPlaylist": descPlaylist.text,
         "imageUrl": imageUrl,
         "imageName": fileName,
+      }).then((document) {
+        setState(() {
+          docId = document.id;
+        });
       });
+      ;
       print("berhasil buat playlist");
     } catch (e) {
       print('Error copying file: $e');
@@ -249,6 +255,7 @@ class _makePlaylistState extends State<makePlaylist> {
                 onTap: () async {
                   await uplaodFile(fileName, filePath);
                   context.read<UsersProvider>().tambahPlaylistBaru(
+                        id: docId,
                         namePlaylist: namePlaylist.text,
                         descPlaylist: descPlaylist.text,
                         selectedImage: selectedImage,
