@@ -19,6 +19,34 @@ class login extends StatefulWidget {
 }
 
 class _loginState extends State<login> {
+  late FirebaseFirestore db;
+
+  @override
+  void initState() {
+    super.initState();
+    initializeFirestore();
+  }
+
+  Future<void> initializeFirestore() async {
+    try {
+      // Attempt to get the Firestore instance
+      db = FirebaseFirestore.instance;
+      // Access or perform operations on the Firestore instance as needed
+
+      print("Firestore instance obtained successfully");
+    } catch (e) {
+      // Handle the error
+      print("Error accessing Firestore: $e");
+
+      // Check if the error is due to no Firebase app being created
+      if (e is FirebaseException && e.code == 'app-not-initialized') {
+        print("No Firebase app has been created.");
+        // You might want to initialize Firebase here or take appropriate action.
+        // Example: Firebase.initializeApp();
+      }
+    }
+  }
+
   final _emailTextController = TextEditingController();
   final _passwordTextController = TextEditingController();
   @override
@@ -136,9 +164,8 @@ class _loginState extends State<login> {
                             password: _passwordTextController.text)
                         .then((value) async {
                       showAlertDialog(context, "Login Berhasil");
-
                       // tampilkan playlist per user
-                      await FirebaseFirestore.instance
+                      await db
                           .collection('Users')
                           .doc(FirebaseAuth.instance.currentUser!.uid)
                           .collection("Playlist")
@@ -163,7 +190,7 @@ class _loginState extends State<login> {
                       );
 
                       // tampikan semua lagu milik artis
-                      await FirebaseFirestore.instance
+                      await db
                           .collection('Users')
                           .doc(FirebaseAuth.instance.currentUser!.uid)
                           .collection("ArtistSong")
@@ -189,10 +216,7 @@ class _loginState extends State<login> {
                         onError: (e) => print("Error completing: $e"),
                       );
                       //tampilkan semua lagu yang ada
-                      await FirebaseFirestore.instance
-                          .collection('Songs')
-                          .get()
-                          .then(
+                      await db.collection('Songs').get().then(
                         (querySnapshot) {
                           for (var docSnapshot in querySnapshot.docs) {
                             context.read<UsersProvider>().uploadSong2(

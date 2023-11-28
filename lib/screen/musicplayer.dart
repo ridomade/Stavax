@@ -77,13 +77,25 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
 
   Future<void> _init(List<AudioSource> audioQuery) async {
     await _audioPlayer.setLoopMode(LoopMode.all);
-    await _audioPlayer.setAudioSource(
-      ConcatenatingAudioSource(
-        children: audioQuery,
-      ),
-      initialIndex: widget.CurrIdx,
-      preload: true,
-    );
+    try {
+      if (_audioPlayer != null) {
+        await _audioPlayer.setAudioSource(
+          ConcatenatingAudioSource(
+            children: audioQuery,
+          ),
+          initialIndex: widget.CurrIdx,
+          preload: true,
+        );
+        // Audio source set successfully
+        print("Audio source set successfully");
+      } else {
+        // Handle the case where _audioPlayer is null
+        print("_audioPlayer is null. Cannot set audio source.");
+      }
+    } catch (e) {
+      // Handle other errors that might occur during audio source setting
+      print("Error setting audio source: $e");
+    }
 
     // Mulai pemutaran lagu setelah mengatur audio source
     _audioPlayer.play();

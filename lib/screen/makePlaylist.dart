@@ -4,6 +4,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:stavax_new/model/uploadToFirebase.dart';
 import 'package:stavax_new/provider/classUser.dart';
+import 'package:stavax_new/widgets/resuablePopUp.dart';
 import '../constants/colors.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -253,17 +254,28 @@ class _makePlaylistState extends State<makePlaylist> {
             Center(
               child: InkWell(
                 onTap: () async {
-                  await uplaodFile(fileName, filePath);
-                  context.read<UsersProvider>().tambahPlaylistBaru(
-                        id: docId,
-                        namePlaylist: namePlaylist.text,
-                        descPlaylist: descPlaylist.text,
-                        selectedImage: selectedImage,
-                        selectedImageFileName: selectedImageFileName,
-                        imageUrll: await imageUrl,
-                        // imageNameInStorages : imageNameInStorage,
-                      );
-                  Navigator.pop(context);
+                  if (namePlaylist.text.isEmpty) {
+                    showAlertDialog(
+                        context, "The Playlist Name Cannot be Empty");
+                  } else if (descPlaylist.text.isEmpty) {
+                    showAlertDialog(
+                        context, "The Playlist Description Cannot be Empty");
+                  } else if (fileName == null && filePath == null) {
+                    showAlertDialog(
+                        context, "The Playlist Image Cannot be Empty");
+                  } else {
+                    await uplaodFile(fileName, filePath);
+                    context.read<UsersProvider>().tambahPlaylistBaru(
+                          id: docId,
+                          namePlaylist: namePlaylist.text,
+                          descPlaylist: descPlaylist.text,
+                          selectedImage: selectedImage,
+                          selectedImageFileName: selectedImageFileName,
+                          imageUrll: await imageUrl,
+                          // imageNameInStorages : imageNameInStorage,
+                        );
+                    Navigator.pop(context);
+                  }
                 },
                 child: Container(
                   width: 94,
