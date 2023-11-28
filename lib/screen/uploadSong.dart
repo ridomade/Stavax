@@ -267,6 +267,7 @@ class _uploadSongState extends State<uploadSong> {
                           fontSize: 10,
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
