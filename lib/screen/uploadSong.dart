@@ -6,6 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:stavax_new/constants/colors.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:stavax_new/provider/classListSongs.dart';
 import 'package:stavax_new/provider/classUser.dart';
 import 'package:stavax_new/widgets/resuablePopUp.dart';
 import 'package:uuid/uuid.dart';
@@ -377,15 +378,24 @@ class _uploadSongState extends State<uploadSong> {
                           .collection("ArtistSong")
                           .add({"song": songReference});
 
-                      context.read<UsersProvider>().uploadSong(
-                          id: docId,
-                          title: songName.text,
-                          //nama yang upload
-                          artist: artisName,
-                          image: selectedImage,
-                          selectedImageFileName: selectedImageFileName,
-                          // download url song
-                          song: _songPath.toString());
+                      context.read<ListOfSongs>().uploadSong(
+                            title: songName.text,
+                            artist: artisName,
+                            image: selectedImage,
+                            selectedImageFileName: selectedImageFileName,
+                            song: _songPath.toString(),
+                            id: docId,
+                            user: context.read<UsersProvider>(),
+                          );
+                      // id: docId,
+                      // title: songName.text,
+                      // //nama yang upload
+                      // artist: artisName,
+                      // image: selectedImage,
+                      // selectedImageFileName: selectedImageFileName,
+                      // // download url song
+                      // song: _songPath.toString()
+
                       Navigator.pop(context);
                     } else if (_imageFileName == null &&
                         _imagePath == null &&

@@ -2,13 +2,16 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:stavax_new/provider/classListSongs.dart';
 import 'package:stavax_new/provider/classUser.dart';
 import '../constants/colors.dart';
 import '../provider/classSong.dart';
 import '../screen/musicplayer.dart';
 import '../provider/classPlaylist.dart';
 
-List<Songs> filteredSongs = songArr;
+ListOfSongs listOfSongs = ListOfSongs();
+
+List<Songs> filteredSongs = listOfSongs.songArray;
 List<Playlist> playlistParam = [];
 List<Songs> songParam = [];
 
@@ -74,7 +77,7 @@ class _addToPlaylistState extends State<addToPlaylist> {
                 itemCount: filteredSongs.length,
                 itemBuilder: (context, index) {
                   return searchSongResult(
-                      iniListLagu: songArr[index],
+                      iniListLagu: listOfSongs.songArray[index],
                       iniPlaylist: widget.iniplaylist);
                 },
               ),
@@ -171,7 +174,7 @@ class _addToPlaylistState extends State<addToPlaylist> {
   }
 
   void filterSongs() {
-    filteredSongs = songArr
+    filteredSongs = listOfSongs.songArray
         .where((song) =>
             song.title.toLowerCase().contains(searchString.toLowerCase()))
         .toList();

@@ -1,11 +1,13 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:stavax_new/provider/classListSongs.dart';
 import '../constants/colors.dart';
 import '../provider/classSong.dart';
 import '../screen/musicplayer.dart';
 
-List<Songs> filteredSongs = songArr;
+ListOfSongs listOfSongs = ListOfSongs();
+List<Songs> filteredSongs = listOfSongs.songArray;
 
 class search_song extends StatefulWidget {
   const search_song({Key? key}) : super(key: key);
@@ -120,7 +122,7 @@ class _search_songState extends State<search_song> {
   }
 
   void filterSongs() {
-    filteredSongs = songArr
+    filteredSongs = listOfSongs.songArray
         .where((song) =>
             song.title.toLowerCase().contains(searchString.toLowerCase()))
         .toList();

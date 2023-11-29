@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 import 'package:stavax_new/constants/colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:stavax_new/fetchDatabase/fetchSong.dart';
+import 'package:stavax_new/provider/classListSongs.dart';
 import 'package:stavax_new/provider/classSong.dart';
 import 'package:stavax_new/provider/classUser.dart';
 import 'package:stavax_new/screen/uploadSong.dart';
@@ -56,7 +58,7 @@ class _artistscreenState extends State<artistscreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               IconButton(
-                onPressed: () {
+                onPressed: () async {
                   Navigator.pop(context);
                 },
                 icon: Icon(
@@ -307,7 +309,7 @@ class ListSong extends StatelessWidget {
                         // Perform actions on tap
                         // e.g., call a function to remove the song
 
-                        context.read<UsersProvider>().hapusLaguArtist(
+                        context.read<ListOfSongs>().hapusLaguBener(
                               user: iniuser,
                               song: inisong,
                             );

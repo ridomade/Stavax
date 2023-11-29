@@ -8,7 +8,10 @@ import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:rxdart/rxdart.dart' as rxdart;
 import 'package:provider/provider.dart';
+import 'package:stavax_new/fetchDatabase/fetchSong.dart';
+import 'package:stavax_new/provider/classListSongs.dart';
 import 'package:stavax_new/provider/classUser.dart';
+import 'package:stavax_new/screen/artist.dart';
 import 'package:stavax_new/screen/profile.dart';
 import '../provider/classSong.dart';
 import '../screen/musicplayer.dart';
@@ -37,6 +40,21 @@ class _HomeState extends State<Home> {
   void initState() {
     getUser();
     super.initState();
+    _initializeSongs();
+  }
+
+  void _initializeSongs() async {
+    try {
+      List<Songs> songArray = context.read<ListOfSongs>().songArray;
+      print("song arr sebelum homescreen : $songArray");
+      songArray = await ftechSongsFromFirebase();
+      print("Songs fetched successfully:");
+      print("song arr homescreen : $songArray");
+      // print(songArr);
+      setState(() {});
+    } catch (e) {
+      print("Error fetching songs: $e");
+    }
   }
 
   void getUser() {
@@ -150,16 +168,36 @@ class _HomeState extends State<Home> {
                             children: [
                               Expanded(
                                 child: ListView.builder(
-                                  itemCount: songArr.length,
+                                  itemCount: context
+                                      .watch<ListOfSongs>()
+                                      .songArray
+                                      .length,
                                   itemBuilder: (context, index) {
-                                    if (index < songArr.length) {
+                                    if (index <
+                                        context
+                                            .watch<ListOfSongs>()
+                                            .songArray
+                                            .length) {
                                       return RecentlyPlayedHome(
-                                        inirecent: songArr[index],
-                                        currIdx: index,
-                                      );
+                                          inirecent: context
+                                              .watch<ListOfSongs>()
+                                              .songArray[index],
+                                          currIdx: index);
                                     }
                                   },
                                 ),
+
+                                // ListView.builder(
+                                //   itemCount: songArray.length,
+                                //   itemBuilder: (context, index) {
+                                //     if (index < songArray.length) {
+                                //       return RecentlyPlayedHome(
+                                //         inirecent: songArray[index],
+                                //         currIdx: index,
+                                //       );
+                                //     }
+                                //   },
+                                // ),
                               ),
                             ],
                           )),
@@ -294,8 +332,10 @@ class _RecentlyPlayedHomeState extends State<RecentlyPlayedHome> {
               context,
               MaterialPageRoute(builder: (context) {
                 return AudioPlayerScreen(
-                  listSong: songArr,
-                  song: songArr[widget.currIdx], // Use widget.currIdx here
+                  listSong: context.watch<ListOfSongs>().songArray,
+                  song: context
+                      .watch<ListOfSongs>()
+                      .songArray[widget.currIdx], // Use widget.currIdx here
                   CurrIdx: widget.currIdx,
                 );
               }),
@@ -385,7 +425,7 @@ class _RecentlyPlayedHomeState extends State<RecentlyPlayedHome> {
       ],
     );
   }
-
+}
   // void displayPersistentBottomSheet() {
   //   Scaffold.of(context).showBottomSheet<void>((BuildContext context) {
   //     return PersistentBottomSheetContent(
@@ -394,259 +434,259 @@ class _RecentlyPlayedHomeState extends State<RecentlyPlayedHome> {
   //         CurrIdx: widget.currIdx);
   //   });
   // }
-}
 
-class PositionData {
-  const PositionData(
-    this.position,
-    this.bufferedPosition,
-    this.duration,
-  );
 
-  final Duration position;
-  final Duration bufferedPosition;
-  final Duration duration;
-}
+// class PositionData {
+//   const PositionData(
+//     this.position,
+//     this.bufferedPosition,
+//     this.duration,
+//   );
 
-class PersistentBottomSheetContent extends StatefulWidget {
-  final List<Songs> listSong;
-  final Songs song;
-  final int CurrIdx;
+//   final Duration position;
+//   final Duration bufferedPosition;
+//   final Duration duration;
+// }
 
-  const PersistentBottomSheetContent({
-    Key? key,
-    required this.listSong,
-    required this.song,
-    required this.CurrIdx,
-  }) : super(key: key);
-  @override
-  _PersistentBottomSheetContentState createState() =>
-      _PersistentBottomSheetContentState();
-}
+// class PersistentBottomSheetContent extends StatefulWidget {
+//   final List<Songs> listSong;
+//   final Songs song;
+//   final int CurrIdx;
 
-class _PersistentBottomSheetContentState
-    extends State<PersistentBottomSheetContent> {
-  late AudioPlayer _audioPlayer;
+//   const PersistentBottomSheetContent({
+//     Key? key,
+//     required this.listSong,
+//     required this.song,
+//     required this.CurrIdx,
+//   }) : super(key: key);
+//   @override
+//   _PersistentBottomSheetContentState createState() =>
+//       _PersistentBottomSheetContentState();
+// }
 
-  Stream<PositionData> get _positionDataStream =>
-      rxdart.Rx.combineLatest3<Duration, Duration, Duration?, PositionData>(
-        _audioPlayer.positionStream,
-        _audioPlayer.bufferedPositionStream,
-        _audioPlayer.durationStream,
-        (position, bufferedPosition, duration) => PositionData(
-          position,
-          bufferedPosition,
-          duration ?? Duration.zero,
-        ),
-      );
+// class _PersistentBottomSheetContentState
+//     extends State<PersistentBottomSheetContent> {
+//   late AudioPlayer _audioPlayer;
 
-  @override
-  void initState() {
-    super.initState();
-    _audioPlayer = AudioPlayer();
-    List<AudioSource> audioQuery = [];
-    for (int i = 0; i < widget.listSong.length; i++) {
-      audioQuery.add(AudioSource.uri(
-        Uri.parse('asset:///' + widget.listSong[i].song),
-        tag: MediaItem(
-          id: widget.listSong[i].id.toString(), // Use toString() for id
-          title: widget.listSong[i].title,
-          artist: widget.listSong[i].artist,
-          artUri: Uri.parse(
-            widget.listSong[i].image,
-          ),
-        ),
-      ));
-    }
+//   Stream<PositionData> get _positionDataStream =>
+//       rxdart.Rx.combineLatest3<Duration, Duration, Duration?, PositionData>(
+//         _audioPlayer.positionStream,
+//         _audioPlayer.bufferedPositionStream,
+//         _audioPlayer.durationStream,
+//         (position, bufferedPosition, duration) => PositionData(
+//           position,
+//           bufferedPosition,
+//           duration ?? Duration.zero,
+//         ),
+//       );
 
-    _init(audioQuery);
-  }
+//   @override
+//   void initState() {
+//     super.initState();
+//     _audioPlayer = AudioPlayer();
+//     List<AudioSource> audioQuery = [];
+//     for (int i = 0; i < widget.listSong.length; i++) {
+//       audioQuery.add(AudioSource.uri(
+//         Uri.parse('asset:///' + widget.listSong[i].song),
+//         tag: MediaItem(
+//           id: widget.listSong[i].id.toString(), // Use toString() for id
+//           title: widget.listSong[i].title,
+//           artist: widget.listSong[i].artist,
+//           artUri: Uri.parse(
+//             widget.listSong[i].image,
+//           ),
+//         ),
+//       ));
+//     }
 
-  Future<void> _init(List<AudioSource> audioQuery) async {
-    await _audioPlayer.setLoopMode(LoopMode.all);
-    await _audioPlayer.setAudioSource(
-      ConcatenatingAudioSource(
-        children: audioQuery,
-      ),
-      initialIndex: widget.CurrIdx,
-      preload: true,
-    );
+//     _init(audioQuery);
+//   }
 
-    // Mulai pemutaran lagu setelah mengatur audio source
-    _audioPlayer.play();
+//   Future<void> _init(List<AudioSource> audioQuery) async {
+//     await _audioPlayer.setLoopMode(LoopMode.all);
+//     await _audioPlayer.setAudioSource(
+//       ConcatenatingAudioSource(
+//         children: audioQuery,
+//       ),
+//       initialIndex: widget.CurrIdx,
+//       preload: true,
+//     );
 
-    // Tambahkan listener untuk mengelola pemutaran lagu
-    _audioPlayer.playerStateStream.listen((playerState) {
-      if (playerState.processingState == ProcessingState.completed) {
-        // Lagu selesai, mungkin Anda ingin menangani ini di sini
-      }
-    });
-  }
+//     // Mulai pemutaran lagu setelah mengatur audio source
+//     _audioPlayer.play();
 
-  @override
-  void dispose() {
-    _audioPlayer.dispose();
-    super.dispose();
-  }
+//     // Tambahkan listener untuk mengelola pemutaran lagu
+//     _audioPlayer.playerStateStream.listen((playerState) {
+//       if (playerState.processingState == ProcessingState.completed) {
+//         // Lagu selesai, mungkin Anda ingin menangani ini di sini
+//       }
+//     });
+//   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(15),
-      width: double.infinity,
-      height: 80,
-      decoration: BoxDecoration(
-        color: Color(0xff004e96),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          StreamBuilder<SequenceState?>(
-            stream: _audioPlayer.sequenceStateStream,
-            builder: (context, snapshot) {
-              final state = snapshot.data;
-              if (state?.sequence.isEmpty ?? true) {
-                return const SizedBox();
-              }
-              final inimetadata = state!.currentSource!.tag as MediaItem;
-              return MediaMetadata(
-                  imageUrl: inimetadata.artUri.toString(),
-                  title: inimetadata.title,
-                  artist: inimetadata.artist ?? ' ');
-            },
-          ),
-          ControlsMiniPlayer(audioPlayer: _audioPlayer),
-        ],
-      ),
-    );
-  }
-}
+//   @override
+//   void dispose() {
+//     _audioPlayer.dispose();
+//     super.dispose();
+//   }
 
-class MediaMetadata extends StatelessWidget {
-  const MediaMetadata({
-    super.key,
-    required this.imageUrl,
-    required this.title,
-    required this.artist,
-  });
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       padding: EdgeInsets.all(15),
+//       width: double.infinity,
+//       height: 80,
+//       decoration: BoxDecoration(
+//         color: Color(0xff004e96),
+//       ),
+//       child: Row(
+//         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//         children: [
+//           StreamBuilder<SequenceState?>(
+//             stream: _audioPlayer.sequenceStateStream,
+//             builder: (context, snapshot) {
+//               final state = snapshot.data;
+//               if (state?.sequence.isEmpty ?? true) {
+//                 return const SizedBox();
+//               }
+//               final inimetadata = state!.currentSource!.tag as MediaItem;
+//               return MediaMetadata(
+//                   imageUrl: inimetadata.artUri.toString(),
+//                   title: inimetadata.title,
+//                   artist: inimetadata.artist ?? ' ');
+//             },
+//           ),
+//           ControlsMiniPlayer(audioPlayer: _audioPlayer),
+//         ],
+//       ),
+//     );
+//   }
+// }
 
-  final String imageUrl;
-  final String title;
-  final String artist;
+// class MediaMetadata extends StatelessWidget {
+//   const MediaMetadata({
+//     super.key,
+//     required this.imageUrl,
+//     required this.title,
+//     required this.artist,
+//   });
 
-  @override
-  Widget build(BuildContext context) {
-    return Row(children: [
-      DecoratedBox(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Container(
-          alignment: Alignment.topCenter,
-          child: imageUrl != null
-              ? File(imageUrl).existsSync() // Check if it's a local file
-                  ? Image.file(
-                      File(imageUrl),
-                      width: 56,
-                      height: 56,
-                    )
-                  : imageUrl.startsWith('assets/') // Check if it's an asset
-                      ? Image.asset(
-                          imageUrl,
-                          width: 56,
-                          height: 56,
-                        )
-                      : Image.network(
-                          imageUrl,
-                          width: 56,
-                          height: 56,
-                        )
-              : SizedBox.shrink(),
-        ),
-        // ClipRRect(
-        //   borderRadius: BorderRadius.circular(10),
-        //   child: Image.asset(
-        //     imageUrl,
-        //   ),
-        // ),
-      ),
-      const SizedBox(
-        width: 8,
-      ),
-      Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 14,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          Text(
-            artist,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 9,
-              fontWeight: FontWeight.w500,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    ]);
-  }
-}
+//   final String imageUrl;
+//   final String title;
+//   final String artist;
 
-class ControlsMiniPlayer extends StatelessWidget {
-  const ControlsMiniPlayer({
-    Key? key,
-    required this.audioPlayer,
-  }) : super(key: key);
+//   @override
+//   Widget build(BuildContext context) {
+//     return Row(children: [
+//       DecoratedBox(
+//         decoration: BoxDecoration(
+//           borderRadius: BorderRadius.circular(10),
+//         ),
+//         child: Container(
+//           alignment: Alignment.topCenter,
+//           child: imageUrl != null
+//               ? File(imageUrl).existsSync() // Check if it's a local file
+//                   ? Image.file(
+//                       File(imageUrl),
+//                       width: 56,
+//                       height: 56,
+//                     )
+//                   : imageUrl.startsWith('assets/') // Check if it's an asset
+//                       ? Image.asset(
+//                           imageUrl,
+//                           width: 56,
+//                           height: 56,
+//                         )
+//                       : Image.network(
+//                           imageUrl,
+//                           width: 56,
+//                           height: 56,
+//                         )
+//               : SizedBox.shrink(),
+//         ),
+//         // ClipRRect(
+//         //   borderRadius: BorderRadius.circular(10),
+//         //   child: Image.asset(
+//         //     imageUrl,
+//         //   ),
+//         // ),
+//       ),
+//       const SizedBox(
+//         width: 8,
+//       ),
+//       Column(
+//         mainAxisAlignment: MainAxisAlignment.center,
+//         crossAxisAlignment: CrossAxisAlignment.start,
+//         children: [
+//           Text(
+//             title,
+//             style: const TextStyle(
+//               color: Colors.white,
+//               fontSize: 14,
+//             ),
+//             textAlign: TextAlign.center,
+//           ),
+//           Text(
+//             artist,
+//             style: TextStyle(
+//               color: Colors.white,
+//               fontSize: 9,
+//               fontWeight: FontWeight.w500,
+//             ),
+//             textAlign: TextAlign.center,
+//           ),
+//         ],
+//       ),
+//     ]);
+//   }
+// }
 
-  final AudioPlayer audioPlayer;
+// class ControlsMiniPlayer extends StatelessWidget {
+//   const ControlsMiniPlayer({
+//     Key? key,
+//     required this.audioPlayer,
+//   }) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        StreamBuilder<PlayerState>(
-          stream: audioPlayer.playerStateStream,
-          builder: (context, snapshot) {
-            final playerState = snapshot.data;
-            final processingState = playerState?.processingState;
-            final playing = playerState?.playing;
+//   final AudioPlayer audioPlayer;
 
-            if (!(playing ?? false)) {
-              return IconButton(
-                onPressed: audioPlayer.play,
-                iconSize: 30,
-                color: Colors.white,
-                icon: const Icon(Icons.play_arrow_rounded),
-              );
-            } else if (processingState != ProcessingState.completed) {
-              return IconButton(
-                onPressed: () {
-                  audioPlayer.pause();
-                  Navigator.of(context).pop();
-                },
-                iconSize: 30,
-                color: Colors.white,
-                icon: const Icon(Icons.pause_rounded),
-              );
-            }
+//   @override
+//   Widget build(BuildContext context) {
+//     return Row(
+//       mainAxisAlignment: MainAxisAlignment.center,
+//       children: [
+//         StreamBuilder<PlayerState>(
+//           stream: audioPlayer.playerStateStream,
+//           builder: (context, snapshot) {
+//             final playerState = snapshot.data;
+//             final processingState = playerState?.processingState;
+//             final playing = playerState?.playing;
 
-            return const Icon(
-              Icons.play_arrow_rounded,
-              size: 30,
-              color: Colors.white,
-            );
-          },
-        ),
-      ],
-    );
-  }
-}
+//             if (!(playing ?? false)) {
+//               return IconButton(
+//                 onPressed: audioPlayer.play,
+//                 iconSize: 30,
+//                 color: Colors.white,
+//                 icon: const Icon(Icons.play_arrow_rounded),
+//               );
+//             } else if (processingState != ProcessingState.completed) {
+//               return IconButton(
+//                 onPressed: () {
+//                   audioPlayer.pause();
+//                   Navigator.of(context).pop();
+//                 },
+//                 iconSize: 30,
+//                 color: Colors.white,
+//                 icon: const Icon(Icons.pause_rounded),
+//               );
+//             }
+
+//             return const Icon(
+//               Icons.play_arrow_rounded,
+//               size: 30,
+//               color: Colors.white,
+//             );
+//           },
+//         ),
+//       ],
+//     );
+//   }
+// }
