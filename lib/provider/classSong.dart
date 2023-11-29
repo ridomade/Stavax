@@ -8,15 +8,33 @@ class Songs extends ChangeNotifier {
   String image;
   String song;
 
-  Songs(
-      {required this.id,
-      required this.title,
-      required this.artist,
-      required this.image,
-      required this.song});
+  Songs({
+    this.id = "",
+    this.title = "",
+    this.artist = "",
+    this.image = "",
+    this.song = "",
+  });
+
+  Songs.fromSnapshot(snapshot)
+      : id = snapshot.id,
+        title = snapshot['songTitle'],
+        artist = snapshot['artistName'],
+        image = snapshot['imageUrl'],
+        song = snapshot['songUrl'];
+
+  factory Songs.fromMap(Map<String, dynamic> map) {
+    return Songs(
+      id: map['id'],
+      title: map['title'],
+      artist: map['artist'],
+      image: map['image'],
+      song: map['song'],
+    );
+  }
 }
 
-List<Songs> songArr = [];
+// List<Songs> songArr = [];
 
 // List<Songs> songArrs = [
 //   Songs(

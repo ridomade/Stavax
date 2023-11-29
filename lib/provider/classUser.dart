@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:stavax_new/provider/classPlaylist.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:stavax_new/provider/classSong.dart';
+import 'package:stavax_new/provider/classListSongs.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:io';
 
@@ -293,8 +294,7 @@ class UsersProvider extends ChangeNotifier {
         }
       });
     });
-    user.songArtist.remove(song);
-    songArr.remove(song);
+
     notifyListeners();
   }
 
@@ -360,53 +360,54 @@ class UsersProvider extends ChangeNotifier {
   //   print("berhasil Hapus Lagu");
   // }
 
-  void uploadSong({
-    required String title,
-    required String artist,
-    required File? image,
-    required String? selectedImageFileName,
-    required String song,
-    required String id,
-  }) async {
-    if (title.isNotEmpty && image != null && selectedImageFileName != null) {
-      // Mendapatkan direktori dokumen aplikasi
-      final appDocDir = await getApplicationDocumentsDirectory();
-      final imageFileName =
-          selectedImageFileName; // Menggunakan nama file yang terpilih
-      final localImage = File("${appDocDir.path}/$imageFileName");
-      // Mengecek apakah file lokal ada
-      if (await localImage.exists()) {
-        // File lokal ada, Anda bisa menggunakan localImage untuk mengaksesnya
-        // Tambahkan playlist baru dengan path gambar lokal
-        songArr.add(Songs(
-          id: id,
-          title: title,
-          artist: artist,
-          image: localImage.path,
-          song: song,
-        ));
-        songArtist.add(Songs(
-          id: id,
-          title: title,
-          artist: artist,
-          image: localImage.path,
-          song: song,
-        ));
+  // void uploadSong({
+  //   required String title,
+  //   required String artist,
+  //   required File? image,
+  //   required String? selectedImageFileName,
+  //   required String song,
+  //   required String id,
+  //   required _ListOfSong listsong
+  // }) async {
+  //   if (title.isNotEmpty && image != null && selectedImageFileName != null) {
+  //     // Mendapatkan direktori dokumen aplikasi
+  //     final appDocDir = await getApplicationDocumentsDirectory();
+  //     final imageFileName =
+  //         selectedImageFileName; // Menggunakan nama file yang terpilih
+  //     final localImage = File("${appDocDir.path}/$imageFileName");
+  //     // Mengecek apakah file lokal ada
+  //     if (await localImage.exists()) {
+  //       // File lokal ada, Anda bisa menggunakan localImage untuk mengaksesnya
+  //       // Tambahkan playlist baru dengan path gambar lokal
+  //       _listofSong.songArray.add(Songs(
+  //         id: id,
+  //         title: title,
+  //         artist: artist,
+  //         image: localImage.path,
+  //         song: song,
+  //       ));
+  //       songArtist.add(Songs(
+  //         id: id,
+  //         title: title,
+  //         artist: artist,
+  //         image: localImage.path,
+  //         song: song,
+  //       ));
 
-        // print(id);
-        // print(title);
-        // print(artist);
-        // print(image);
-        // print(song);
-        notifyListeners();
-        // Bersihkan input setelah menambah playlist baru
-        // Lakukan tindakan lain setelah berhasil menambahkan playlist
-      } else {
-        // File lokal tidak ditemukan, Anda perlu menanganinya sesuai kebutuhan Anda
-        print('File lokal tidak ditemukan.');
-      }
-    }
-  }
+  //       // print(id);
+  //       // print(title);
+  //       // print(artist);
+  //       // print(image);
+  //       // print(song);
+  //       notifyListeners();
+  //       // Bersihkan input setelah menambah playlist baru
+  //       // Lakukan tindakan lain setelah berhasil menambahkan playlist
+  //     } else {
+  //       // File lokal tidak ditemukan, Anda perlu menanganinya sesuai kebutuhan Anda
+  //       print('File lokal tidak ditemukan.');
+  //     }
+  //   }
+  // }
 
   void uploadSong2({
     required String id,
@@ -415,9 +416,10 @@ class UsersProvider extends ChangeNotifier {
     required String image,
     required String selectedImageFileName,
     required String song,
+    required ListOfSongs listOfSongs,
   }) async {
     if (title.isNotEmpty && image != null && selectedImageFileName != null) {
-      songArr.add(Songs(
+      listOfSongs.songArray.add(Songs(
         id: id,
         title: title,
         artist: artist,

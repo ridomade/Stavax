@@ -60,7 +60,25 @@ class _profileState extends State<profile> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             IconButton(
-              onPressed: () {
+              onPressed: () async {
+                // await db.collection('Songs').get().then(
+                //   (querySnapshot) {
+                //     for (var docSnapshot in querySnapshot.docs) {
+                //       context.read<UsersProvider>().uploadSong2(
+                //             id: docSnapshot.id,
+                //             title: docSnapshot.data()['songTitle'],
+                //             //nama yang upload
+                //             artist: docSnapshot.data()['artistName'],
+                //             image: docSnapshot.data()['imageUrl'],
+                //             selectedImageFileName:
+                //                 docSnapshot.data()['songTitle'],
+                //             // download url song
+                //             song: docSnapshot.data()['songUrl'],
+                //           );
+                //     }
+                //   },
+                //   onError: (e) => print("Error completing: $e"),
+                // );
                 Navigator.pop(context);
               },
               icon: Icon(

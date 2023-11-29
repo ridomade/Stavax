@@ -216,24 +216,25 @@ class _loginState extends State<login> {
                         onError: (e) => print("Error completing: $e"),
                       );
                       //tampilkan semua lagu yang ada
-                      await db.collection('Songs').get().then(
-                        (querySnapshot) {
-                          for (var docSnapshot in querySnapshot.docs) {
-                            context.read<UsersProvider>().uploadSong2(
-                                  id: docSnapshot.id,
-                                  title: docSnapshot.data()['songTitle'],
-                                  //nama yang upload
-                                  artist: docSnapshot.data()['artistName'],
-                                  image: docSnapshot.data()['imageUrl'],
-                                  selectedImageFileName:
-                                      docSnapshot.data()['songTitle'],
-                                  // download url song
-                                  song: docSnapshot.data()['songUrl'],
-                                );
-                          }
-                        },
-                        onError: (e) => print("Error completing: $e"),
-                      );
+                      // await db.collection('Songs').get().then(
+                      //   (querySnapshot) {
+                      //     for (var docSnapshot in querySnapshot.docs) {
+                      //       context.read<UsersProvider>().uploadSong2(
+                      //             id: docSnapshot.id,
+                      //             title: docSnapshot.data()['songTitle'],
+                      //             //nama yang upload
+                      //             artist: docSnapshot.data()['artistName'],
+                      //             image: docSnapshot.data()['imageUrl'],
+                      //             selectedImageFileName:
+                      //                 docSnapshot.data()['songTitle'],
+                      //             // download url song
+                      //             song: docSnapshot.data()['songUrl'],
+                      //           );
+                      //       print("Song login Sesudah $songArr");
+                      //     }
+                      //   },
+                      //   onError: (e) => print("Error completing: $e"),
+                      // );
 
                       Navigator.push(
                         context,

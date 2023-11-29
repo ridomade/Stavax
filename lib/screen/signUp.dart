@@ -222,27 +222,27 @@ class _signUpUserState extends State<singUp> {
                             .doc(FirebaseAuth.instance.currentUser!.uid)
                             .set(data);
                         print("Berhasil buat akun");
-                        await FirebaseFirestore.instance
-                            .collection('Songs')
-                            .get()
-                            .then(
-                          (querySnapshot) {
-                            for (var docSnapshot in querySnapshot.docs) {
-                              context.read<UsersProvider>().uploadSong2(
-                                    id: docSnapshot.id,
-                                    title: docSnapshot.data()['songTitle'],
-                                    //nama yang upload
-                                    artist: docSnapshot.data()['artistName'],
-                                    image: docSnapshot.data()['imageUrl'],
-                                    selectedImageFileName:
-                                        docSnapshot.data()['songTitle'],
-                                    // download url song
-                                    song: docSnapshot.data()['songUrl'],
-                                  );
-                            }
-                          },
-                          onError: (e) => print("Error completing: $e"),
-                        );
+                        // await FirebaseFirestore.instance
+                        //     .collection('Songs')
+                        //     .get()
+                        //     .then(
+                        //   (querySnapshot) {
+                        //     for (var docSnapshot in querySnapshot.docs) {
+                        //       context.read<UsersProvider>().uploadSong2(
+                        //             id: docSnapshot.id,
+                        //             title: docSnapshot.data()['songTitle'],
+                        //             //nama yang upload
+                        //             artist: docSnapshot.data()['artistName'],
+                        //             image: docSnapshot.data()['imageUrl'],
+                        //             selectedImageFileName:
+                        //                 docSnapshot.data()['songTitle'],
+                        //             // download url song
+                        //             song: docSnapshot.data()['songUrl'],
+                        //           );
+                        //     }
+                        //   },
+                        //   onError: (e) => print("Error completing: $e"),
+                        // );
                         Navigator.push(
                           context,
                           MaterialPageRoute(
