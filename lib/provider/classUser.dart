@@ -208,10 +208,11 @@ class UsersProvider extends ChangeNotifier {
 
   Future<void> tambahLagukePlaylistDariFetch({
     required Map datas,
+    required Playlist playlist,
   }) async {
     for (var key in datas.keys) {
       for (var value in datas[key]) {
-        key.songList.add(value);
+        playlist.songList.add(value);
       }
     }
   }
