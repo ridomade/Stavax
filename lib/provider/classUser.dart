@@ -212,7 +212,9 @@ class UsersProvider extends ChangeNotifier {
   }) async {
     for (var key in datas.keys) {
       for (var value in datas[key]) {
-        playlist.songList.add(value);
+        if (playlist.name == key.name) {
+          playlist.songList.add(value);
+        }
       }
     }
   }
