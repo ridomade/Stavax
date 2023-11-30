@@ -11,7 +11,7 @@ import '../provider/classPlaylist.dart';
 
 ListOfSongs listOfSongs = ListOfSongs();
 
-List<Songs> filteredSongs = listOfSongs.songArray;
+List<Songs> filteredSongs = [];
 List<Playlist> playlistParam = [];
 List<Songs> songParam = [];
 
@@ -77,7 +77,7 @@ class _addToPlaylistState extends State<addToPlaylist> {
                 itemCount: filteredSongs.length,
                 itemBuilder: (context, index) {
                   return searchSongResult(
-                      iniListLagu: listOfSongs.songArray[index],
+                      iniListLagu: filteredSongs[index],
                       iniPlaylist: widget.iniplaylist);
                 },
               ),
@@ -174,7 +174,9 @@ class _addToPlaylistState extends State<addToPlaylist> {
   }
 
   void filterSongs() {
-    filteredSongs = listOfSongs.songArray
+    filteredSongs = context
+        .watch<ListOfSongs>()
+        .songArray
         .where((song) =>
             song.title.toLowerCase().contains(searchString.toLowerCase()))
         .toList();

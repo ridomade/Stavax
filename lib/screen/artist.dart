@@ -160,11 +160,14 @@ class _artistscreenState extends State<artistscreen> {
                                       .songArtist
                                       .length) {
                                 return ListSong(
-                                    inisong: context
-                                        .watch<UsersProvider>()
-                                        .songArtist[index],
-                                    iniuser: context.watch<UsersProvider>(),
-                                    currIdx: index);
+                                  inisong: context
+                                      .watch<UsersProvider>()
+                                      .songArtist[index],
+                                  iniuser: context.watch<UsersProvider>(),
+                                  currIdx: index,
+                                  listSong:
+                                      context.watch<ListOfSongs>().songArray,
+                                );
                               }
                             },
                           ),
@@ -216,11 +219,13 @@ class ListSong extends StatelessWidget {
   final Songs inisong;
   final UsersProvider iniuser;
   final int currIdx;
+  final List<Songs> listSong;
   const ListSong({
     Key? key,
     required this.inisong,
     required this.iniuser,
     required this.currIdx,
+    required this.listSong,
   }) : super(key: key);
 
   @override
@@ -305,14 +310,16 @@ class ListSong extends StatelessWidget {
                   context: context,
                   builder: (BuildContext context) {
                     return InkWell(
-                      onTap: () async {
+                      onTap: () {
                         // Perform actions on tap
                         // e.g., call a function to remove the song
 
                         context.read<ListOfSongs>().hapusLaguBener(
-                              user: iniuser,
-                              song: inisong,
+                              song: listSong[currIdx],
                             );
+                        context
+                            .read<UsersProvider>()
+                            .deleteSongArtist(user: iniuser, song: inisong);
                         Navigator.pop(context);
                       },
                       child: Container(

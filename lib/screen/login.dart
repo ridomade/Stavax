@@ -190,31 +190,31 @@ class _loginState extends State<login> {
                       );
 
                       // tampikan semua lagu milik artis
-                      await db
-                          .collection('Users')
-                          .doc(FirebaseAuth.instance.currentUser!.uid)
-                          .collection("ArtistSong")
-                          .get()
-                          .then(
-                        (querySnapshot) async {
-                          for (var docSnapshot in querySnapshot.docs) {
-                            DocumentReference<Map<String, dynamic>>
-                                favoriteSongRef = docSnapshot.data()["song"];
-                            var adder = await favoriteSongRef.get();
-                            context.read<UsersProvider>().uploadSong3(
-                                  id: adder.id,
-                                  title: adder['songTitle'],
-                                  //nama yang upload
-                                  artist: adder['artistName'],
-                                  image: adder['imageUrl'],
-                                  selectedImageFileName: adder['songTitle'],
-                                  // download url song
-                                  song: adder['songUrl'],
-                                );
-                          }
-                        },
-                        onError: (e) => print("Error completing: $e"),
-                      );
+                      // await db
+                      //     .collection('Users')
+                      //     .doc(FirebaseAuth.instance.currentUser!.uid)
+                      //     .collection("ArtistSong")
+                      //     .get()
+                      //     .then(
+                      //   (querySnapshot) async {
+                      //     for (var docSnapshot in querySnapshot.docs) {
+                      //       DocumentReference<Map<String, dynamic>>
+                      //           favoriteSongRef = docSnapshot.data()["song"];
+                      //       var adder = await favoriteSongRef.get();
+                      //       context.read<UsersProvider>().uploadSong3(
+                      //             id: adder.id,
+                      //             title: adder['songTitle'],
+                      //             //nama yang upload
+                      //             artist: adder['artistName'],
+                      //             image: adder['imageUrl'],
+                      //             selectedImageFileName: adder['songTitle'],
+                      //             // download url song
+                      //             song: adder['songUrl'],
+                      //           );
+                      //     }
+                      //   },
+                      //   onError: (e) => print("Error completing: $e"),
+                      // );
                       //tampilkan semua lagu yang ada
                       // await db.collection('Songs').get().then(
                       //   (querySnapshot) {
