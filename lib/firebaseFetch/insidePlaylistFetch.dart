@@ -25,22 +25,31 @@ Future<Map> insidePlaylistFetch() async {
           imageUrl: docSnapshot.data()['imageUrl'],
           image: docSnapshot.data()['imageName'],
         );
-        for (var i = 0; i < docSnapshot.data()["song"].length; i++) {
-          var song = await docSnapshot.data()["song"][i].get();
-          Songs songAdder = Songs(
-            id: song.id,
-            title: song['songTitle'],
-            artist: song['artistName'],
-            image: song['imageUrl'],
-            song: song['songUrl'],
-          );
-          songList.add(songAdder);
+        try {
+          if (docSnapshot.data()["song"] != null) {
+            for (var i = 0; i < docSnapshot.data()["song"].length; i++) {
+              var song = await docSnapshot.data()["song"][i].get();
+              Songs songAdder = Songs(
+                id: song.id,
+                title: song['songTitle'],
+                artist: song['artistName'],
+                image: song['imageUrl'],
+                song: song['songUrl'],
+              );
+              songList.add(songAdder);
+            }
+          } else {
+            print("The 'song' field is null in the document.");
+            // Handle the case where 'song' field is null
+          }
+        } catch (e) {
+          print("Error fetching songs: $e");
+          // Handle the error as needed
         }
         data[PlaylistArrData] = songList;
       }
     },
     onError: (e) => print("Error completing: $e"),
   );
-  print(data);
   return data;
 }

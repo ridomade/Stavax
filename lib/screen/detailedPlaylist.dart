@@ -29,35 +29,15 @@ class detailedPlaylist extends StatefulWidget {
 class _detailedPlaylistState extends State<detailedPlaylist> {
   @override
   void initState() {
-    _initializeSongs();
+    if (widget.iniPlaylist.songList.isEmpty) {
+      _initializeSongs();
+    }
     super.initState();
   }
 
   void _initializeSongs() async {
     try {
-      // context.read<UsersProvider>().tambahLagukePlaylistDariFetch(
-      //     playlist: playlistFetch(), song: songFetch());
-
-      // List<Playlist> playlistAdder = [];
-
-      // usersProvider = context.read<UsersProvider>();
-
-      // playlistAdder = await playlistFetch();
-
-      // for (var curPlaylist = 0;
-      //     curPlaylist < playlistAdder.length;
-      //     curPlaylist++) {
-      //   print(playlistAdder[curPlaylist].name);
-      //   List<Songs> songAdder = [];
-      //   songAdder = await await songFetch();
-
-      //   for (var curSong = 0; curSong < songAdder.length; curSong++) {
-      //     print(songAdder[curSong].artist);
-      //     await usersProvider.tambahLagukePlaylistDariFetch(
-      //         playlist: playlistAdder[curPlaylist], song: songAdder[curSong]);
-      //   }
-      // }
-      context.read<UsersProvider>().tambahLagukePlaylistDariFetch(
+      await context.read<UsersProvider>().tambahLagukePlaylistDariFetch(
           datas: await insidePlaylistFetch(), playlist: widget.iniPlaylist);
     } catch (e) {
       print("Error fetching songs: $e");
