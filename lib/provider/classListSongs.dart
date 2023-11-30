@@ -15,7 +15,6 @@ class ListOfSongs extends ChangeNotifier {
     required String? selectedImageFileName,
     required String song,
     required String id,
-    required UsersProvider user,
   }) async {
     if (title.isNotEmpty && image != null && selectedImageFileName != null) {
       // Mendapatkan direktori dokumen aplikasi
@@ -28,13 +27,6 @@ class ListOfSongs extends ChangeNotifier {
         // File lokal ada, Anda bisa menggunakan localImage untuk mengaksesnya
         // Tambahkan playlist baru dengan path gambar lokal
         songArray.add(Songs(
-          id: id,
-          title: title,
-          artist: artist,
-          image: localImage.path,
-          song: song,
-        ));
-        user.songArtist.add(Songs(
           id: id,
           title: title,
           artist: artist,
@@ -57,10 +49,19 @@ class ListOfSongs extends ChangeNotifier {
     }
   }
 
-  Future<void> hapusLaguBener(
-      {required UsersProvider user, required Songs song}) async {
+  void hapusLaguBener({
+    required Songs song,
+  }) async {
     songArray.remove(song);
-    user.songArtist.remove(song);
     notifyListeners();
   }
+
+  // void filterSongs(String searchString) {
+  //   final filteredSongs = songArray
+  //       .where((song) =>
+  //           song.title.toLowerCase().contains(searchString.toLowerCase()))
+  //       .toList();
+  //   songArray = filteredSongs;
+  //   notifyListeners();
+  // }
 }

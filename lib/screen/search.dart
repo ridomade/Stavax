@@ -1,13 +1,16 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:stavax_new/provider/classListSongs.dart';
 import '../constants/colors.dart';
 import '../provider/classSong.dart';
 import '../screen/musicplayer.dart';
 
 ListOfSongs listOfSongs = ListOfSongs();
-List<Songs> filteredSongs = listOfSongs.songArray;
+List<Songs> filteredSongs = [];
+// List<Songs> allsong = [];
+// List<Songs> filteredSongs = listOfSongs.songArray;
 
 class search_song extends StatefulWidget {
   const search_song({Key? key}) : super(key: key);
@@ -17,11 +20,12 @@ class search_song extends StatefulWidget {
 }
 
 class _search_songState extends State<search_song> {
+  // List<Songs> filteredSongs = [];
   String searchString = ''; // Variabel penyimpanan string pencarian
 
   @override
   Widget build(BuildContext context) {
-    filterSongs(); // Filter daftar lagu berdasarkan pencarian
+    filterSongs();
 
     return Scaffold(
       backgroundColor: color1,
@@ -122,10 +126,17 @@ class _search_songState extends State<search_song> {
   }
 
   void filterSongs() {
-    filteredSongs = listOfSongs.songArray
+    // allsong = context
+    //     .watch<ListOfSongs>()
+    //     .songArray;
+    filteredSongs = context
+        .watch<ListOfSongs>()
+        .songArray
         .where((song) =>
             song.title.toLowerCase().contains(searchString.toLowerCase()))
         .toList();
+    // Move notifyListeners to an appropriate place in your widget tree
+    // notifyListeners();
   }
 }
 
