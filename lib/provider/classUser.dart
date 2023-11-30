@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:stavax_new/firebaseFetch/playlistFetch.dart';
 import 'package:stavax_new/provider/classPlaylist.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:stavax_new/provider/classSong.dart';
@@ -73,6 +74,20 @@ class UsersProvider extends ChangeNotifier {
         // File lokal tidak ditemukan, Anda perlu menanganinya sesuai kebutuhan Anda
         print('File lokal tidak ditemukan.');
       }
+    }
+  }
+
+  void tambahPlaylistDariFetch({
+    required List<Playlist> playlist,
+  }) async {
+    for (var i = 0; i < playlist.length; i++) {
+      playListArr.add(Playlist(
+        id: playlist[i].id,
+        name: playlist[i].name,
+        image: playlist[i].imageUrl,
+        desc: playlist[i].desc,
+        imageUrl: playlist[i].imageUrl,
+      ));
     }
   }
 
@@ -191,71 +206,14 @@ class UsersProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> tambahLagukePlaylist2() async {
-    Playlist playlist = Playlist();
-    // List<Songs> listSong = [];
-    Songs song;
-    await FirebaseFirestore.instance
-        .collection('Users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .collection("Playlist")
-        .get()
-        .then(
-      (querySnapshot) {
-        for (var docSnapshot in querySnapshot.docs) {
-          playlist.id = docSnapshot.id;
-          playlist.name = docSnapshot.data()['namePlaylist'];
-          playlist.desc = docSnapshot.data()['descPlaylist'];
-          playlist.image = docSnapshot.data()['imageUrl'];
-          playlist.imageUrl = docSnapshot.data()['imageUrl'];
-          // playlist.songList = listSong;
-        }
-      },
-      onError: (e) => print("Error completing: $e"),
-    );
-    await FirebaseFirestore.instance
-        .collection('Users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .collection("ArtistSong")
-        .get()
-        .then(
-      (querySnapshot) async {
-        for (var docSnapshot in querySnapshot.docs) {
-          DocumentReference<Map<String, dynamic>> favoriteSongRef =
-              docSnapshot.data()["song"];
-          var adder = await favoriteSongRef.get();
-          song = Songs(
-              id: adder.id,
-              title: adder['songTitle'],
-              artist: adder['artistName'],
-              image: adder['imageUrl'],
-              song: adder['songUrl']);
-          print(">>>>>>");
-          print(playlist.id);
-          print(playlist.name);
-          print(playlist.image);
-          print(playlist.desc);
-          print(playlist.imageUrl);
-          print(playlist.songList);
-          print(">>>>>>");
-          print(song.id);
-          print(song.title);
-          print(song.artist);
-          print(song.image);
-          print(song.song);
-          print(">>>>>>");
-          playlist.songList.add(song);
-          print(playlist.songList[0].id);
-          print(playlist.songList[0].artist);
-          print(playlist.songList[0].title);
-          print(playlist.songList[0].image);
-          print(playlist.songList[0].song);
-        }
-      },
-      onError: (e) => print("Error completing: $e"),
-    );
-
-    notifyListeners();
+  Future<void> tambahLagukePlaylistDariFetch({
+    required Map datas,
+  }) async {
+    for (var key in datas.keys) {
+      for (var value in datas[key]) {
+        key.songList.add(value);
+      }
+    }
   }
 
   void hapusLagukePlaylist({required Playlist playlist, required Songs song}) {
@@ -298,8 +256,40 @@ class UsersProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  //hapus lagu artist
-  void deleteSongArtist({required UsersProvider user, required Songs song}) {
+  //hapus lagu dari collection Songs dan collection artisSong
+  Future<void> deleteSongArtist(
+      {required UsersProvider user, required Songs song}) async {
+    var deletedSongCollection =
+        await FirebaseFirestore.instance.collection("Songs");
+
+    var deletedArtistSongCollection = await FirebaseFirestore.instance
+        .collection("Users")
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection("ArtistSong");
+
+    deletedSongCollection.doc(song.id).get().then((DocumentSnapshot doc) async {
+      final data = doc.data() as Map<String, dynamic>;
+
+      await FirebaseStorage.instance
+          .ref()
+          .child("Song/Songs/" + data["songNameUrl"])
+          .delete();
+      await FirebaseStorage.instance
+          .ref()
+          .child("Song/Images/" + data["imageNameUrl"])
+          .delete();
+      // delete Songs Collection
+      await deletedSongCollection.doc(song.id).delete();
+      // delete ArtistSong Collection
+      deletedArtistSongCollection
+          .where("song", isEqualTo: deletedSongCollection.doc(song.id))
+          .get()
+          .then((querySnapshot) async {
+        for (var docSnapshot in querySnapshot.docs) {
+          await deletedArtistSongCollection.doc(docSnapshot.id).delete();
+        }
+      });
+    });
     user.songArtist.remove(song);
     notifyListeners();
   }
@@ -477,23 +467,36 @@ class UsersProvider extends ChangeNotifier {
     }
   }
 
-  void uploadSong3({
-    required String id,
-    required String title,
-    required String artist,
-    required String image,
-    required String selectedImageFileName,
-    required String song,
+  // void uploadSong3({
+  //   required String id,
+  //   required String title,
+  //   required String artist,
+  //   required String image,
+  //   required String selectedImageFileName,
+  //   required String song,
+  // }) async {
+  //   if (title.isNotEmpty && image != null && selectedImageFileName != null) {
+  //     songArtist.add(Songs(
+  //       id: id,
+  //       title: title,
+  //       artist: artist,
+  //       image: image,
+  //       song: song,
+  //     ));
+  //     notifyListeners();
+  //   }
+  // }
+  void uploadSongArtistlistDariFetch({
+    required List<Songs> song,
   }) async {
-    if (title.isNotEmpty && image != null && selectedImageFileName != null) {
+    for (var i = 0; i < song.length; i++) {
       songArtist.add(Songs(
-        id: id,
-        title: title,
-        artist: artist,
-        image: image,
-        song: song,
+        id: song[i].id,
+        title: song[i].title,
+        artist: song[i].artist,
+        image: song[i].image,
+        song: song[i].song,
       ));
-      notifyListeners();
     }
   }
 }

@@ -9,10 +9,16 @@ import 'package:just_audio_background/just_audio_background.dart';
 import 'package:rxdart/rxdart.dart' as rxdart;
 import 'package:provider/provider.dart';
 import 'package:stavax_new/fetchDatabase/fetchSong.dart';
+import 'package:stavax_new/firebaseFetch/artistSongFetch.dart';
+import 'package:stavax_new/firebaseFetch/insidePlaylistFetch.dart';
+import 'package:stavax_new/firebaseFetch/playlistFetch.dart';
+import 'package:stavax_new/firebaseFetch/songFetch.dart';
 import 'package:stavax_new/provider/classListSongs.dart';
+import 'package:stavax_new/provider/classPlaylist.dart';
 import 'package:stavax_new/provider/classUser.dart';
 import 'package:stavax_new/screen/artist.dart';
 import 'package:stavax_new/screen/profile.dart';
+import 'package:stavax_new/screen/uploadSong.dart';
 import '../provider/classSong.dart';
 import '../screen/musicplayer.dart';
 import '../screen/playlistScreen.dart';
@@ -39,18 +45,30 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     getUser();
-    super.initState();
     _initializeSongs();
+    super.initState();
   }
 
   void _initializeSongs() async {
     try {
-      List<Songs> songArray = context.read<ListOfSongs>().songArray;
-      print("song arr sebelum homescreen : $songArray");
-      songArray = await ftechSongsFromFirebase();
-      print("Songs fetched successfully:");
-      print("song arr homescreen : $songArray");
-      // print(songArr);
+      context
+          .read<ListOfSongs>()
+          .uploadSonglistDariFetch(song: await songFetch());
+      // context
+      //     .read<UsersProvider>()
+      //     .uploadSongArtistlistDariFetch(song: await artistSongFetch());
+      context
+          .read<UsersProvider>()
+          .uploadSongArtistlistDariFetch(song: await artistSongFetch());
+
+      context
+          .read<UsersProvider>()
+          .tambahPlaylistDariFetch(playlist: await playlistFetch());
+
+      // print("song arr sebelum homescreen : $songArray");
+      // songArray = await songFetch();
+      // print("Songs fetched successfully:");
+      // print("song arr homescreen : $songArray");
       setState(() {});
     } catch (e) {
       print("Error fetching songs: $e");

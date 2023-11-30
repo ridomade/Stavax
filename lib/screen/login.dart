@@ -156,8 +156,8 @@ class _loginState extends State<login> {
                 ),
                 InkWell(
                   onTap: () async {
-                    //tampilkan semua lagu dalam playlist
-                    await context.read<UsersProvider>().tambahLagukePlaylist2();
+                    // tampilkan semua lagu dalam playlist
+                    // await context.read<UsersProvider>().tambahLagukePlaylist2();
                     FirebaseAuth.instance
                         .signInWithEmailAndPassword(
                             email: _emailTextController.text.trim(),
@@ -165,29 +165,29 @@ class _loginState extends State<login> {
                         .then((value) async {
                       showAlertDialog(context, "Login Berhasil");
                       // tampilkan playlist per user
-                      await db
-                          .collection('Users')
-                          .doc(FirebaseAuth.instance.currentUser!.uid)
-                          .collection("Playlist")
-                          .get()
-                          .then(
-                        (querySnapshot) {
-                          for (var docSnapshot in querySnapshot.docs) {
-                            context.read<UsersProvider>().tambahPlaylistBaru2(
-                                  id: docSnapshot.id,
-                                  namePlaylist:
-                                      docSnapshot.data()['namePlaylist'],
-                                  descPlaylist:
-                                      docSnapshot.data()['descPlaylist'],
-                                  selectedImage: docSnapshot.data()['imageUrl'],
-                                  selectedImageFileName:
-                                      docSnapshot.data()['imageName'],
-                                  imageUrll: docSnapshot.data()['imageUrl'],
-                                );
-                          }
-                        },
-                        onError: (e) => print("Error completing: $e"),
-                      );
+                      //   await db
+                      //       .collection('Users')
+                      //       .doc(FirebaseAuth.instance.currentUser!.uid)
+                      //       .collection("Playlist")
+                      //       .get()
+                      //       .then(
+                      //     (querySnapshot) {
+                      //       for (var docSnapshot in querySnapshot.docs) {
+                      //         context.read<UsersProvider>().tambahPlaylistBaru2(
+                      //               id: docSnapshot.id,
+                      //               namePlaylist:
+                      //                   docSnapshot.data()['namePlaylist'],
+                      //               descPlaylist:
+                      //                   docSnapshot.data()['descPlaylist'],
+                      //               selectedImage: docSnapshot.data()['imageUrl'],
+                      //               selectedImageFileName:
+                      //                   docSnapshot.data()['imageName'],
+                      //               imageUrll: docSnapshot.data()['imageUrl'],
+                      //             );
+                      //       }
+                      //     },
+                      //     onError: (e) => print("Error completing: $e"),
+                      //   );
 
                       // tampikan semua lagu milik artis
                       // await db
@@ -215,7 +215,7 @@ class _loginState extends State<login> {
                       //   },
                       //   onError: (e) => print("Error completing: $e"),
                       // );
-                      //tampilkan semua lagu yang ada
+                      // tampilkan semua lagu yang ada
                       // await db.collection('Songs').get().then(
                       //   (querySnapshot) {
                       //     for (var docSnapshot in querySnapshot.docs) {
