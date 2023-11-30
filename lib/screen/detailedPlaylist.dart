@@ -57,9 +57,8 @@ class _detailedPlaylistState extends State<detailedPlaylist> {
       //         playlist: playlistAdder[curPlaylist], song: songAdder[curSong]);
       //   }
       // }
-      context
-          .read<UsersProvider>()
-          .tambahLagukePlaylistDariFetch(datas: await insidePlaylistFetch());
+      context.read<UsersProvider>().tambahLagukePlaylistDariFetch(
+          datas: await insidePlaylistFetch(), playlist: widget.iniPlaylist);
     } catch (e) {
       print("Error fetching songs: $e");
     }
