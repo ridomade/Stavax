@@ -2,12 +2,18 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:stavax_new/firebaseFetch/artistSongFetch.dart';
+import 'package:stavax_new/firebaseFetch/insidePlaylistFetch.dart';
+import 'package:stavax_new/firebaseFetch/playlistFetch.dart';
+import 'package:stavax_new/firebaseFetch/songFetch.dart';
 import '../constants/colors.dart';
 import '../screen/addtoplaylist.dart';
 import '../screen/musicplayer.dart';
 import '../provider/classPlaylist.dart';
 import '../provider/classSong.dart';
 import '../provider/classUser.dart';
+
+late UsersProvider usersProvider;
 
 class detailedPlaylist extends StatefulWidget {
   final Playlist iniPlaylist;
@@ -21,6 +27,44 @@ class detailedPlaylist extends StatefulWidget {
 }
 
 class _detailedPlaylistState extends State<detailedPlaylist> {
+  @override
+  void initState() {
+    _initializeSongs();
+    super.initState();
+  }
+
+  void _initializeSongs() async {
+    try {
+      // context.read<UsersProvider>().tambahLagukePlaylistDariFetch(
+      //     playlist: playlistFetch(), song: songFetch());
+
+      // List<Playlist> playlistAdder = [];
+
+      // usersProvider = context.read<UsersProvider>();
+
+      // playlistAdder = await playlistFetch();
+
+      // for (var curPlaylist = 0;
+      //     curPlaylist < playlistAdder.length;
+      //     curPlaylist++) {
+      //   print(playlistAdder[curPlaylist].name);
+      //   List<Songs> songAdder = [];
+      //   songAdder = await await songFetch();
+
+      //   for (var curSong = 0; curSong < songAdder.length; curSong++) {
+      //     print(songAdder[curSong].artist);
+      //     await usersProvider.tambahLagukePlaylistDariFetch(
+      //         playlist: playlistAdder[curPlaylist], song: songAdder[curSong]);
+      //   }
+      // }
+      context
+          .read<UsersProvider>()
+          .tambahLagukePlaylistDariFetch(datas: await insidePlaylistFetch());
+    } catch (e) {
+      print("Error fetching songs: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

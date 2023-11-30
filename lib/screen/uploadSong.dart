@@ -350,33 +350,33 @@ class _uploadSongState extends State<uploadSong> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 InkWell(
-                  onTap: () {
+                  onTap: () async {
                     if (_imageFileName != null &&
                         _imagePath != null &&
                         _songFileName != null &&
                         _songPath != null) {
-                      // await uplaodImageFile(_imageFileName!, _imagePath!);
-                      // await uplaodSongFile(_songFileName!, _songPath!);
-                      // await FirebaseFirestore.instance.collection('Songs').add({
-                      //   "artistName": artisName,
-                      //   "songTitle": songName.text,
-                      //   "imageNameUrl": imageNameUrl,
-                      //   "imageUrl": imageUrl,
-                      //   "songNameUrl": songNameUrl,
-                      //   "songUrl": songUrl,
-                      // }).then((document) {
-                      //   setState(() {
-                      //     docId = document.id;
-                      //   });
-                      // });
-                      // var songReference = FirebaseFirestore.instance
-                      //     .collection("Songs")
-                      //     .doc(docId);
-                      // await FirebaseFirestore.instance
-                      //     .collection('Users')
-                      //     .doc(FirebaseAuth.instance.currentUser!.uid)
-                      //     .collection("ArtistSong")
-                      //     .add({"song": songReference});
+                      await uplaodImageFile(_imageFileName!, _imagePath!);
+                      await uplaodSongFile(_songFileName!, _songPath!);
+                      await FirebaseFirestore.instance.collection('Songs').add({
+                        "artistName": artisName,
+                        "songTitle": songName.text,
+                        "imageNameUrl": imageNameUrl,
+                        "imageUrl": imageUrl,
+                        "songNameUrl": songNameUrl,
+                        "songUrl": songUrl,
+                      }).then((document) {
+                        setState(() {
+                          docId = document.id;
+                        });
+                      });
+                      var songReference = FirebaseFirestore.instance
+                          .collection("Songs")
+                          .doc(docId);
+                      await FirebaseFirestore.instance
+                          .collection('Users')
+                          .doc(FirebaseAuth.instance.currentUser!.uid)
+                          .collection("ArtistSong")
+                          .add({"song": songReference});
 
                       context.read<ListOfSongs>().uploadSong(
                             title: songName.text,
@@ -384,7 +384,7 @@ class _uploadSongState extends State<uploadSong> {
                             image: selectedImage,
                             selectedImageFileName: selectedImageFileName,
                             song: _songPath.toString(),
-                            id: "1",
+                            id: docId,
                           );
                       context.read<UsersProvider>().uploadSongArtist(
                             title: songName.text,
@@ -392,7 +392,7 @@ class _uploadSongState extends State<uploadSong> {
                             image: selectedImage,
                             selectedImageFileName: selectedImageFileName,
                             song: _songPath.toString(),
-                            id: "1",
+                            id: docId,
                           );
                       // id: docId,
                       // title: songName.text,
