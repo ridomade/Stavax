@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:side_sheet/side_sheet.dart';
 import 'package:stavax_new/constants/colors.dart';
 import 'package:stavax_new/provider/classPlaylist.dart';
 import 'package:stavax_new/provider/classUser.dart';
@@ -94,8 +95,23 @@ class _profileState extends State<profile> {
                   fontWeight: FontWeight.w600,
                   color: Colors.white),
             ),
-            SizedBox(
-              width: 45,
+            IconButton(
+              onPressed: () {
+                SideSheet.right(
+                  context: context,
+                  sheetColor: color1,
+                  width: MediaQuery.of(context).size.width * 0.7,
+                  body: Container(
+                    padding: EdgeInsets.all(20),
+                    child: ProfileEdit(),
+                  ),
+                );
+              },
+              icon: Icon(
+                Icons.menu,
+                size: 30,
+                color: Colors.white,
+              ),
             ),
           ],
         ),
@@ -307,6 +323,208 @@ class _profileState extends State<profile> {
         ),
       ),
     );
+  }
+}
+
+class ProfileEdit extends StatefulWidget {
+  @override
+  _ProfileEditState createState() => _ProfileEditState();
+}
+
+class _ProfileEditState extends State<ProfileEdit> {
+  bool isEditing = false;
+  String username = 'asf';
+  late TextEditingController usernameController;
+
+  @override
+  void initState() {
+    super.initState();
+    usernameController = TextEditingController(text: username);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        child: isEditing
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 40),
+                  Center(
+                    child: CircleAvatar(
+                      radius: 60,
+                      backgroundImage:
+                          AssetImage('assets/playlist1/playlist1_gambar2.jpg'),
+                    ),
+                  ),
+                  SizedBox(height: 22),
+                  Text(
+                    "Username",
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white),
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Container(
+                    width: double.infinity,
+                    height: 37,
+                    decoration: BoxDecoration(
+                      color: Color(0xff25303d),
+                    ),
+                    child: TextField(
+                      controller: usernameController,
+                      style: TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        contentPadding:
+                            EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                        hintText: 'New Username',
+                        hintStyle: TextStyle(color: Colors.grey),
+                        border: InputBorder.none,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 15),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            isEditing = !isEditing;
+                          });
+                          username = usernameController.text;
+                        },
+                        child: Container(
+                          width: 101,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Color(0xff004e96),
+                          ),
+                          child: Center(
+                            child: Text(
+                              "Confirm",
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            isEditing = !isEditing;
+                          });
+                          username = usernameController.text;
+                        },
+                        child: Container(
+                          width: 101,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.red,
+                          ),
+                          child: Center(
+                            child: Text(
+                              "Confirm",
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                ],
+              )
+            : Stack(
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(height: 40),
+                      CircleAvatar(
+                        radius: 60,
+                        backgroundImage: AssetImage(
+                            'assets/playlist1/playlist1_gambar2.jpg'),
+                      ),
+                      SizedBox(height: 22),
+                      Text(
+                        usernameController.text.isEmpty
+                            ? username
+                            : usernameController
+                                .text, // Use the controller's text
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white),
+                      ),
+                      Text(
+                        "Example@gmail.com",
+                        style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey),
+                      ),
+                      SizedBox(height: 15),
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            isEditing = !isEditing;
+                          });
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Color(0xffd9d9d9),
+                          ),
+                          child: Center(
+                            child: Text(
+                              "Edit Profile",
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.w700),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    left: 0,
+                    child: InkWell(
+                      onTap: () {},
+                      child: Container(
+                        width: 222,
+                        height: 43,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Color(0xffff2020),
+                        ),
+                        child: Center(
+                          child: Text(
+                            "Log out",
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ));
   }
 }
 
