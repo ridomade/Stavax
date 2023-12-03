@@ -202,14 +202,17 @@ class _signUpUserState extends State<singUp> {
                   width: 94,
                 ),
                 InkWell(
-                  onTap: () {
-                    if (_passwordTextController.text ==
-                        _confirmPasswordTextController.text) {
-                      FirebaseAuth.instance
-                          .createUserWithEmailAndPassword(
-                              email: _emailTextController.text.trim(),
-                              password: _passwordTextController.text)
-                          .then((value) async {
+                  onTap: () async {
+                    try {
+                      if (_passwordTextController.text ==
+                          _confirmPasswordTextController.text) {
+                        await FirebaseAuth.instance
+                            .createUserWithEmailAndPassword(
+                          email: _emailTextController.text.trim(),
+                          password: _passwordTextController.text,
+                        );
+
+                        // Successfully created user
                         final cities =
                             FirebaseFirestore.instance.collection("Users");
                         final data = <String, dynamic>{
@@ -221,48 +224,97 @@ class _signUpUserState extends State<singUp> {
                         cities
                             .doc(FirebaseAuth.instance.currentUser!.uid)
                             .set(data);
+
                         print("Berhasil buat akun");
-                        // await FirebaseFirestore.instance
-                        //     .collection('Songs')
-                        //     .get()
-                        //     .then(
-                        //   (querySnapshot) {
-                        //     for (var docSnapshot in querySnapshot.docs) {
-                        //       context.read<UsersProvider>().uploadSong2(
-                        //             id: docSnapshot.id,
-                        //             title: docSnapshot.data()['songTitle'],
-                        //             //nama yang upload
-                        //             artist: docSnapshot.data()['artistName'],
-                        //             image: docSnapshot.data()['imageUrl'],
-                        //             selectedImageFileName:
-                        //                 docSnapshot.data()['songTitle'],
-                        //             // download url song
-                        //             song: docSnapshot.data()['songUrl'],
-                        //           );
-                        //     }
-                        //   },
-                        //   onError: (e) => print("Error completing: $e"),
-                        // );
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => Home(),
                           ),
                         );
-                      }).onError((error, stackTrace) {
-                        if (error.toString() ==
-                            "[firebase_auth/invalid-email] The email address is badly formatted.") {
+                      } else {
+                        showAlertDialog(context, "Password not matched");
+                      }
+                    } catch (error) {
+                      // Handle specific errors
+                      if (error is FirebaseAuthException) {
+                        if (error.code == 'invalid-email') {
                           showAlertDialog(
-                              context, "email address is badly formatted");
-                        } else if (error.toString() ==
-                            "[firebase_auth/weak-password] Password should be at least 6 characters") {
+                              context, "Email address is badly formatted");
+                        } else if (error.code == 'weak-password') {
                           showAlertDialog(context,
                               "Password should be at least 6 characters");
+                        } else {
+                          // Handle other FirebaseAuthException errors if needed
+                          showAlertDialog(
+                              context, "Registration failed. ${error.message}");
                         }
-                      });
-                    } else {
-                      showAlertDialog(context, "Password not matched");
+                      } else {
+                        // Handle other errors not related to FirebaseAuthException
+                        showAlertDialog(context,
+                            "Registration failed. ${error.toString()}");
+                      }
                     }
+                    // if (_passwordTextController.text ==
+                    //     _confirmPasswordTextController.text) {
+                    //   FirebaseAuth.instance
+                    //       .createUserWithEmailAndPassword(
+                    //           email: _emailTextController.text.trim(),
+                    //           password: _passwordTextController.text)
+                    //       .then((value) async {
+                    //     final cities =
+                    //         FirebaseFirestore.instance.collection("Users");
+                    //     final data = <String, dynamic>{
+                    //       'userName': _usernameTextController.text,
+                    //       'email': _emailTextController.text,
+                    //       'artistRole': false,
+                    //       'listenerRole': true,
+                    //     };
+                    //     cities
+                    //         .doc(FirebaseAuth.instance.currentUser!.uid)
+                    //         .set(data);
+                    //     print("Berhasil buat akun");
+                    //     // await FirebaseFirestore.instance
+                    //     //     .collection('Songs')
+                    //     //     .get()
+                    //     //     .then(
+                    //     //   (querySnapshot) {
+                    //     //     for (var docSnapshot in querySnapshot.docs) {
+                    //     //       context.read<UsersProvider>().uploadSong2(
+                    //     //             id: docSnapshot.id,
+                    //     //             title: docSnapshot.data()['songTitle'],
+                    //     //             //nama yang upload
+                    //     //             artist: docSnapshot.data()['artistName'],
+                    //     //             image: docSnapshot.data()['imageUrl'],
+                    //     //             selectedImageFileName:
+                    //     //                 docSnapshot.data()['songTitle'],
+                    //     //             // download url song
+                    //     //             song: docSnapshot.data()['songUrl'],
+                    //     //           );
+                    //     //     }
+                    //     //   },
+                    //     //   onError: (e) => print("Error completing: $e"),
+                    //     // );
+                    //     Navigator.push(
+                    //       context,
+                    //       MaterialPageRoute(
+                    //         builder: (context) => Home(),
+                    //       ),
+                    //     );
+                    //   }).onError((error, stackTrace) {
+                    //     if (error.toString() ==
+                    //         "[firebase_auth/invalid-email] The email address is badly formatted.") {
+                    //       showAlertDialog(
+                    //           context, "email address is badly formatted");
+                    //     } else if (error.toString() ==
+                    //         "[firebase_auth/weak-password] Password should be at least 6 characters") {
+                    //       showAlertDialog(context,
+                    //           "Password should be at least 6 characters");
+                    //     }
+                    //   });
+                    // } else {
+                    //   showAlertDialog(context, "Password not matched");
+                    // }
                   },
                   child: Container(
                     width: 94,

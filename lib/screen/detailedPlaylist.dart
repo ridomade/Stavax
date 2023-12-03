@@ -37,7 +37,7 @@ class _detailedPlaylistState extends State<detailedPlaylist> {
 
   void _initializeSongs() async {
     try {
-      await context.read<UsersProvider>().tambahLagukePlaylistDariFetch(
+      await context.read<Playlist>().tambahLagukePlaylistDariFetch(
           datas: await insidePlaylistFetch(), playlist: widget.iniPlaylist);
     } catch (e) {
       print("Error fetching songs: $e");

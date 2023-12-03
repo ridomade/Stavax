@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stavax_new/constants/colors.dart';
+import 'package:stavax_new/provider/classListSongs.dart';
 import 'package:stavax_new/provider/classPlaylist.dart';
 import 'package:stavax_new/provider/classSong.dart';
 import 'package:stavax_new/provider/classUser.dart';
@@ -28,23 +29,24 @@ class _loginState extends State<login> {
   }
 
   Future<void> initializeFirestore() async {
-    try {
-      // Attempt to get the Firestore instance
-      db = FirebaseFirestore.instance;
-      // Access or perform operations on the Firestore instance as needed
+    db = FirebaseFirestore.instance;
+    // try {
+    //   // Attempt to get the Firestore instance
+    //   db = FirebaseFirestore.instance;
+    //   // Access or perform operations on the Firestore instance as needed
 
-      print("Firestore instance obtained successfully");
-    } catch (e) {
-      // Handle the error
-      print("Error accessing Firestore: $e");
+    //   print("Firestore instance obtained successfully");
+    // } catch (e) {
+    //   // Handle the error
+    //   print("Error accessing Firestore: $e");
 
-      // Check if the error is due to no Firebase app being created
-      if (e is FirebaseException && e.code == 'app-not-initialized') {
-        print("No Firebase app has been created.");
-        // You might want to initialize Firebase here or take appropriate action.
-        // Example: Firebase.initializeApp();
-      }
-    }
+    //   // Check if the error is due to no Firebase app being created
+    //   if (e is FirebaseException && e.code == 'app-not-initialized') {
+    //     print("No Firebase app has been created.");
+    //     // You might want to initialize Firebase here or take appropriate action.
+    //     // Example: Firebase.initializeApp();
+    //   }
+    // }
   }
 
   final _emailTextController = TextEditingController();
@@ -158,93 +160,98 @@ class _loginState extends State<login> {
                   onTap: () async {
                     // tampilkan semua lagu dalam playlist
                     // await context.read<UsersProvider>().tambahLagukePlaylist2();
-                    FirebaseAuth.instance
-                        .signInWithEmailAndPassword(
-                            email: _emailTextController.text.trim(),
-                            password: _passwordTextController.text)
-                        .then((value) async {
+
+                    try {
+                      await FirebaseAuth.instance.signInWithEmailAndPassword(
+                        email: _emailTextController.text.trim(),
+                        password: _passwordTextController.text,
+                      );
+
+                      // Successful login
                       showAlertDialog(context, "Login Berhasil");
-                      // tampilkan playlist per user
-                      //   await db
-                      //       .collection('Users')
-                      //       .doc(FirebaseAuth.instance.currentUser!.uid)
-                      //       .collection("Playlist")
-                      //       .get()
-                      //       .then(
-                      //     (querySnapshot) {
-                      //       for (var docSnapshot in querySnapshot.docs) {
-                      //         context.read<UsersProvider>().tambahPlaylistBaru2(
-                      //               id: docSnapshot.id,
-                      //               namePlaylist:
-                      //                   docSnapshot.data()['namePlaylist'],
-                      //               descPlaylist:
-                      //                   docSnapshot.data()['descPlaylist'],
-                      //               selectedImage: docSnapshot.data()['imageUrl'],
-                      //               selectedImageFileName:
-                      //                   docSnapshot.data()['imageName'],
-                      //               imageUrll: docSnapshot.data()['imageUrl'],
-                      //             );
-                      //       }
-                      //     },
-                      //     onError: (e) => print("Error completing: $e"),
-                      //   );
-
-                      // tampikan semua lagu milik artis
-                      // await db
-                      //     .collection('Users')
-                      //     .doc(FirebaseAuth.instance.currentUser!.uid)
-                      //     .collection("ArtistSong")
-                      //     .get()
-                      //     .then(
-                      //   (querySnapshot) async {
-                      //     for (var docSnapshot in querySnapshot.docs) {
-                      //       DocumentReference<Map<String, dynamic>>
-                      //           favoriteSongRef = docSnapshot.data()["song"];
-                      //       var adder = await favoriteSongRef.get();
-                      //       context.read<UsersProvider>().uploadSong3(
-                      //             id: adder.id,
-                      //             title: adder['songTitle'],
-                      //             //nama yang upload
-                      //             artist: adder['artistName'],
-                      //             image: adder['imageUrl'],
-                      //             selectedImageFileName: adder['songTitle'],
-                      //             // download url song
-                      //             song: adder['songUrl'],
-                      //           );
-                      //     }
-                      //   },
-                      //   onError: (e) => print("Error completing: $e"),
-                      // );
-                      // tampilkan semua lagu yang ada
-                      // await db.collection('Songs').get().then(
-                      //   (querySnapshot) {
-                      //     for (var docSnapshot in querySnapshot.docs) {
-                      //       context.read<UsersProvider>().uploadSong2(
-                      //             id: docSnapshot.id,
-                      //             title: docSnapshot.data()['songTitle'],
-                      //             //nama yang upload
-                      //             artist: docSnapshot.data()['artistName'],
-                      //             image: docSnapshot.data()['imageUrl'],
-                      //             selectedImageFileName:
-                      //                 docSnapshot.data()['songTitle'],
-                      //             // download url song
-                      //             song: docSnapshot.data()['songUrl'],
-                      //           );
-                      //       print("Song login Sesudah $songArr");
-                      //     }
-                      //   },
-                      //   onError: (e) => print("Error completing: $e"),
-                      // );
-
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => Home(),
                         ),
                       );
-                    }).onError((error, stackTrace) {
+                    } catch (error) {
+                      // Handle login failure
                       showAlertDialog(context, "Email atau Password salah");
-                    });
+                      print("Login error: $error");
+                    }
+
+                    // tampilkan playlist per user
+                    //   await db
+                    //       .collection('Users')
+                    //       .doc(FirebaseAuth.instance.currentUser!.uid)
+                    //       .collection("Playlist")
+                    //       .get()
+                    //       .then(
+                    //     (querySnapshot) {
+                    //       for (var docSnapshot in querySnapshot.docs) {
+                    //         context.read<UsersProvider>().tambahPlaylistBaru2(
+                    //               id: docSnapshot.id,
+                    //               namePlaylist:
+                    //                   docSnapshot.data()['namePlaylist'],
+                    //               descPlaylist:
+                    //                   docSnapshot.data()['descPlaylist'],
+                    //               selectedImage: docSnapshot.data()['imageUrl'],
+                    //               selectedImageFileName:
+                    //                   docSnapshot.data()['imageName'],
+                    //               imageUrll: docSnapshot.data()['imageUrl'],
+                    //             );
+                    //       }
+                    //     },
+                    //     onError: (e) => print("Error completing: $e"),
+                    //   );
+
+                    // tampikan semua lagu milik artis
+                    // await db
+                    //     .collection('Users')
+                    //     .doc(FirebaseAuth.instance.currentUser!.uid)
+                    //     .collection("ArtistSong")
+                    //     .get()
+                    //     .then(
+                    //   (querySnapshot) async {
+                    //     for (var docSnapshot in querySnapshot.docs) {
+                    //       DocumentReference<Map<String, dynamic>>
+                    //           favoriteSongRef = docSnapshot.data()["song"];
+                    //       var adder = await favoriteSongRef.get();
+                    //       context.read<UsersProvider>().uploadSong3(
+                    //             id: adder.id,
+                    //             title: adder['songTitle'],
+                    //             //nama yang upload
+                    //             artist: adder['artistName'],
+                    //             image: adder['imageUrl'],
+                    //             selectedImageFileName: adder['songTitle'],
+                    //             // download url song
+                    //             song: adder['songUrl'],
+                    //           );
+                    //     }
+                    //   },
+                    //   onError: (e) => print("Error completing: $e"),
+                    // );
+                    // tampilkan semua lagu yang ada
+                    // await db.collection('Songs').get().then(
+                    //   (querySnapshot) {
+                    //     for (var docSnapshot in querySnapshot.docs) {
+                    //       context.read<UsersProvider>().uploadSong2(
+                    //             id: docSnapshot.id,
+                    //             title: docSnapshot.data()['songTitle'],
+                    //             //nama yang upload
+                    //             artist: docSnapshot.data()['artistName'],
+                    //             image: docSnapshot.data()['imageUrl'],
+                    //             selectedImageFileName:
+                    //                 docSnapshot.data()['songTitle'],
+                    //             // download url song
+                    //             song: docSnapshot.data()['songUrl'],
+                    //           );
+                    //       print("Song login Sesudah $songArr");
+                    //     }
+                    //   },
+                    //   onError: (e) => print("Error completing: $e"),
+                    // );
                   },
                   child: Container(
                     width: 94,

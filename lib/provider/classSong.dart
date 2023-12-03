@@ -16,22 +16,22 @@ class Songs extends ChangeNotifier {
     this.song = "",
   });
 
-  Songs.fromSnapshot(snapshot)
-      : id = snapshot.id,
-        title = snapshot['songTitle'],
-        artist = snapshot['artistName'],
-        image = snapshot['imageUrl'],
-        song = snapshot['songUrl'];
+  // Songs.fromSnapshot(snapshot)
+  //     : id = snapshot.id,
+  //       title = snapshot['songTitle'],
+  //       artist = snapshot['artistName'],
+  //       image = snapshot['imageUrl'],
+  //       song = snapshot['songUrl'];
 
-  factory Songs.fromMap(Map<String, dynamic> map) {
-    return Songs(
-      id: map['id'],
-      title: map['title'],
-      artist: map['artist'],
-      image: map['image'],
-      song: map['song'],
-    );
-  }
+  // factory Songs.fromMap(Map<String, dynamic> map) {
+  //   return Songs(
+  //     id: map['id'],
+  //     title: map['title'],
+  //     artist: map['artist'],
+  //     image: map['image'],
+  //     song: map['song'],
+  //   );
+  // }
 }
 
 // List<Songs> songArr = [];
