@@ -6,6 +6,7 @@ import 'package:stavax_new/provider/classPlaylist.dart';
 import 'package:stavax_new/provider/classUser.dart';
 import 'package:stavax_new/screen/loginAndSignUp.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:stavax_new/screen/main_screen.dart';
 import 'firebase_options.dart';
 
 // WidgetsFlutterBinding.ensureInitialized();
@@ -15,22 +16,26 @@ import 'firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-    // Firebase initialization successful
-    print("Firebase initialized successfully");
-  } catch (e) {
-    // Check if the exception is related to Firebase already being initialized
-    if (e is FirebaseException && e.code == 'already-in-background') {
-      // Firebase is already initialized in the background
-      print("Firebase is already initialized in the background");
-    } else {
-      // Handle other Firebase initialization errors
-      print("Firebase initialization failed with error: $e");
-    }
-  }
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  // WidgetsFlutterBinding.ensureInitialized();
+  // try {
+  //   await Firebase.initializeApp(
+  //     options: DefaultFirebaseOptions.currentPlatform,
+  //   );
+  //   // Firebase initialization successful
+  //   print("Firebase initialized successfully");
+  // } catch (e) {
+  //   // Check if the exception is related to Firebase already being initialized
+  //   if (e is FirebaseException && e.code == 'already-in-background') {
+  //     // Firebase is already initialized in the background
+  //     print("Firebase is already initialized in the background");
+  //   } else {
+  //     // Handle other Firebase initialization errors
+  //     print("Firebase initialization failed with error: $e");
+  //   }
+  // }
 
   runApp(const MyApp());
 }
@@ -56,7 +61,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Stavax',
         theme: ThemeData(fontFamily: 'Poppins'),
-        home: loginAndSignUp(), // Gantilah Home() dengan widget utama Anda
+        home: main_screen(), // Gantilah Home() dengan widget utama Anda
       ),
     );
   }

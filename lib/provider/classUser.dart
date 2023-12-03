@@ -38,6 +38,20 @@ class UsersProvider extends ChangeNotifier {
     this.listenerRole = true,
   });
 
+  void clearPlaylist() {
+    print("test");
+    print(playListArr.length);
+    playListArr.clear();
+    print("test");
+    print(playListArr.length);
+    notifyListeners();
+  }
+
+  void setid(String uid) {
+    this.id = uid;
+    print(id);
+  }
+
   void tambahPlaylistBaru({
     required String id,
     required String namePlaylist,
@@ -89,6 +103,34 @@ class UsersProvider extends ChangeNotifier {
         imageUrl: playlist[i].imageUrl,
       ));
     }
+    // if (playListArr.isEmpty) {
+    //   for (var i = 0; i < playlist.length; i++) {
+    //     print("p");
+    //     print(i);
+    //     print(playlist.length);
+    //     playListArr.add(Playlist(
+    //       id: playlist[i].id,
+    //       name: playlist[i].name,
+    //       image: playlist[i].imageUrl,
+    //       desc: playlist[i].desc,
+    //       imageUrl: playlist[i].imageUrl,
+    //     ));
+    //   }
+    // } else {
+    //   playListArr.clear();
+    //   for (var i = 0; i < playlist.length; i++) {
+    //     print("p");
+    //     print(i);
+    //     print(playlist.length);
+    //     playListArr.add(Playlist(
+    //       id: playlist[i].id,
+    //       name: playlist[i].name,
+    //       image: playlist[i].imageUrl,
+    //       desc: playlist[i].desc,
+    //       imageUrl: playlist[i].imageUrl,
+    //     ));
+    //   }
+    // }
   }
 
   void tambahPlaylistBaru2({

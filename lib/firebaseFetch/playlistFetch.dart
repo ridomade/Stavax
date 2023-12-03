@@ -6,7 +6,6 @@ import '../provider/classSong.dart';
 
 Future<List<Playlist>> playlistFetch() async {
   List<Playlist> PlaylistArr = [];
-
   await FirebaseFirestore.instance
       .collection('Users')
       .doc(FirebaseAuth.instance.currentUser!.uid)

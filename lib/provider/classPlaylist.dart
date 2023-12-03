@@ -16,4 +16,16 @@ class Playlist extends ChangeNotifier {
     this.desc = "",
     this.imageUrl = "",
   });
+  Future<void> tambahLagukePlaylistDariFetch({
+    required Map datas,
+    required Playlist playlist,
+  }) async {
+    for (var key in datas.keys) {
+      for (var value in datas[key]) {
+        if (playlist.name == key.name) {
+          playlist.songList.add(value);
+        }
+      }
+    }
+  }
 }

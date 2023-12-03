@@ -44,9 +44,9 @@ class _HomeState extends State<Home> {
 
   @override
   void initState() {
+    super.initState();
     getUser();
     _initializeSongs();
-    super.initState();
   }
 
   void _initializeSongs() async {
@@ -60,10 +60,10 @@ class _HomeState extends State<Home> {
       context
           .read<UsersProvider>()
           .uploadSongArtistlistDariFetch(song: await artistSongFetch());
-
-      context
-          .read<UsersProvider>()
-          .tambahPlaylistDariFetch(playlist: await playlistFetch());
+      List<Playlist> playlist = await playlistFetch();
+      print("inipanjang playlist");
+      print(playlist.length);
+      context.read<UsersProvider>().tambahPlaylistDariFetch(playlist: playlist);
 
       // print("song arr sebelum homescreen : $songArray");
       // songArray = await songFetch();

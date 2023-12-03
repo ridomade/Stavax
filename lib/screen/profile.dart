@@ -1,16 +1,21 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:side_sheet/side_sheet.dart';
 import 'package:stavax_new/constants/colors.dart';
+import 'package:stavax_new/model/cleanCache.dart';
+import 'package:stavax_new/provider/classListSongs.dart';
 import 'package:stavax_new/provider/classPlaylist.dart';
+import 'package:stavax_new/provider/classSong.dart';
 import 'package:stavax_new/provider/classUser.dart';
 import 'package:stavax_new/screen/artist.dart';
 import 'package:stavax_new/screen/detailedPlaylist.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:stavax_new/screen/main_screen.dart';
 
 class profile extends StatefulWidget {
   const profile({super.key});
@@ -395,18 +400,17 @@ class _ProfileEditState extends State<ProfileEdit> {
                           setState(() {
                             isEditing = !isEditing;
                           });
-                          username = usernameController.text;
                         },
                         child: Container(
                           width: 101,
                           height: 36,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
-                            color: Color(0xff004e96),
+                            color: Colors.red,
                           ),
                           child: Center(
                             child: Text(
-                              "Confirm",
+                              "Close",
                               style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w700,
@@ -427,7 +431,7 @@ class _ProfileEditState extends State<ProfileEdit> {
                           height: 36,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
-                            color: Colors.red,
+                            color: Color(0xff004e96),
                           ),
                           child: Center(
                             child: Text(
@@ -503,7 +507,22 @@ class _ProfileEditState extends State<ProfileEdit> {
                     right: 0,
                     left: 0,
                     child: InkWell(
-                      onTap: () {},
+                      onTap: () async {
+                        List<Songs> songArray = ListOfSongs().songArray;
+                        for (var i = 0; i < songArray.length; i++) {
+                          context
+                              .read<ListOfSongs>()
+                              .hapusLaguBener(song: songArray[i]);
+                        }
+
+                        FirebaseAuth.instance.signOut();
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => (main_screen()),
+                          ),
+                        );
+                      },
                       child: Container(
                         width: 222,
                         height: 43,
