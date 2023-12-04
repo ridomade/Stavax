@@ -161,24 +161,38 @@ class _loginState extends State<login> {
                     // tampilkan semua lagu dalam playlist
                     // await context.read<UsersProvider>().tambahLagukePlaylist2();
 
-                    try {
-                      await FirebaseAuth.instance.signInWithEmailAndPassword(
-                        email: _emailTextController.text.trim(),
-                        password: _passwordTextController.text,
-                      );
+                    if (_emailTextController.text != "" &&
+                        _passwordTextController.text != "") {
+                      try {
+                        await FirebaseAuth.instance.signInWithEmailAndPassword(
+                          email: _emailTextController.text.trim(),
+                          password: _passwordTextController.text,
+                        );
 
-                      // Successful login
-                      showAlertDialog(context, "Login Berhasil");
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Home(),
-                        ),
-                      );
-                    } catch (error) {
-                      // Handle login failure
-                      showAlertDialog(context, "Email atau Password salah");
-                      print("Login error: $error");
+                        // Successful login
+                        showAlertDialog(context, "Login Berhasil");
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Home(),
+                          ),
+                        );
+                      } catch (error) {
+                        // Handle login failure
+                        showAlertDialog(
+                            context, "Email or Password is Incorrect");
+                        print("Login error: $error");
+                      }
+                    } else {
+                      if (_emailTextController.text == "" &&
+                          _passwordTextController.text == "") {
+                        showAlertDialog(
+                            context, "You must fill in all the form fields!");
+                      } else if (_passwordTextController.text == "") {
+                        showAlertDialog(context, "Password Cannot be Empty!");
+                      } else if (_emailTextController.text == "") {
+                        showAlertDialog(context, "Email Cannot be Empty!");
+                      }
                     }
 
                     // tampilkan playlist per user

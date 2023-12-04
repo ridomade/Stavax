@@ -15,6 +15,7 @@ import 'package:stavax_new/screen/detailedPlaylist.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:stavax_new/screen/loginAndSignUp.dart';
 import 'package:stavax_new/screen/main_screen.dart';
 
 class profile extends StatefulWidget {
@@ -338,13 +339,31 @@ class ProfileEdit extends StatefulWidget {
 
 class _ProfileEditState extends State<ProfileEdit> {
   bool isEditing = false;
-  String username = 'asf';
+  final db = FirebaseFirestore.instance;
+  String userName = "";
+  String email = "";
   late TextEditingController usernameController;
 
   @override
   void initState() {
     super.initState();
-    usernameController = TextEditingController(text: username);
+    getUser();
+    usernameController = TextEditingController(text: userName);
+  }
+
+  void getUser() {
+    final docRef =
+        db.collection("Users").doc(FirebaseAuth.instance.currentUser!.uid);
+    docRef.snapshots().listen(
+      (event) {
+        setState(() {
+          userName = event['userName'];
+          email = event['email'];
+        });
+        // userName = event['userName'];
+      },
+      onError: (error) => print("Listen failed: $error"),
+    );
   }
 
   @override
@@ -424,7 +443,17 @@ class _ProfileEditState extends State<ProfileEdit> {
                           setState(() {
                             isEditing = !isEditing;
                           });
-                          username = usernameController.text;
+                          userName = usernameController.text;
+                          final userNameRef = db
+                              .collection("Users")
+                              .doc(FirebaseAuth.instance.currentUser!.uid);
+                          userNameRef.update({
+                            "userName": usernameController.text
+                          }).then(
+                              (value) => print(
+                                  "DocumentSnapshot successfully updated!"),
+                              onError: (e) =>
+                                  print("Error updating document $e"));
                         },
                         child: Container(
                           width: 101,
@@ -462,7 +491,7 @@ class _ProfileEditState extends State<ProfileEdit> {
                       SizedBox(height: 22),
                       Text(
                         usernameController.text.isEmpty
-                            ? username
+                            ? userName
                             : usernameController
                                 .text, // Use the controller's text
                         style: TextStyle(
@@ -471,7 +500,7 @@ class _ProfileEditState extends State<ProfileEdit> {
                             color: Colors.white),
                       ),
                       Text(
-                        "Example@gmail.com",
+                        email,
                         style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
@@ -508,18 +537,29 @@ class _ProfileEditState extends State<ProfileEdit> {
                     left: 0,
                     child: InkWell(
                       onTap: () async {
-                        List<Songs> songArray = ListOfSongs().songArray;
-                        for (var i = 0; i < songArray.length; i++) {
-                          context
-                              .read<ListOfSongs>()
-                              .hapusLaguBener(song: songArray[i]);
-                        }
-
+                        context.read<UsersProvider>().playListArr = [];
+                        context.read<UsersProvider>().songArtist = [];
+                        context.read<ListOfSongs>().songArray = [];
+                        // print("ini panjang array of song");
+                        // print(context.read<ListOfSongs>().songArray);
+                        // for (var i = 0;
+                        //     i < context.read<ListOfSongs>().songArray.length;
+                        //     i++) {
+                        //   context
+                        //       .read<ListOfSongs>()
+                        //       .songArray
+                        //       .remove(context.read<ListOfSongs>().songArray[i]);
+                        // }
+                        // print(context.read<ListOfSongs>().songArray);
+                        // print("ini panjang playl");
+                        // print(context.read<UsersProvider>().playListArr);
+                        // context.read<UsersProvider>().playListArr.clear();
+                        // print(context.read<UsersProvider>().playListArr);
                         FirebaseAuth.instance.signOut();
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => (main_screen()),
+                            builder: (context) => (loginAndSignUp()),
                           ),
                         );
                       },

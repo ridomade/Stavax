@@ -15,7 +15,7 @@ class main_screen extends StatelessWidget {
           stream: FirebaseAuth.instance.authStateChanges(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              context.read<UsersProvider>().setid(snapshot.data!.uid);
+              FirebaseAuth.instance.currentUser!.uid;
               return Home();
             } else {
               return loginAndSignUp();

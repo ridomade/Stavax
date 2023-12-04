@@ -51,25 +51,10 @@ class _HomeState extends State<Home> {
 
   void _initializeSongs() async {
     try {
-      context
-          .read<ListOfSongs>()
-          .uploadSonglistDariFetch(song: await songFetch());
-      // context
-      //     .read<UsersProvider>()
-      //     .uploadSongArtistlistDariFetch(song: await artistSongFetch());
-      context
-          .read<UsersProvider>()
-          .uploadSongArtistlistDariFetch(song: await artistSongFetch());
-      List<Playlist> playlist = await playlistFetch();
-      print("inipanjang playlist");
-      print(playlist.length);
-      context.read<UsersProvider>().tambahPlaylistDariFetch(playlist: playlist);
-
-      // print("song arr sebelum homescreen : $songArray");
-      // songArray = await songFetch();
-      // print("Songs fetched successfully:");
-      // print("song arr homescreen : $songArray");
-      setState(() {});
+      print("ini home");
+      context.read<ListOfSongs>().uploadSonglistDariFetch();
+      context.read<UsersProvider>().uploadSongArtistlistDariFetch();
+      context.read<UsersProvider>().tambahPlaylistDariFetch();
     } catch (e) {
       print("Error fetching songs: $e");
     }
