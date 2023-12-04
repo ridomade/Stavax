@@ -2,15 +2,15 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:stavax_new/firebaseFetch/songFetch.dart';
 import 'package:stavax_new/provider/classSong.dart';
 import 'package:stavax_new/provider/classUser.dart';
 
 class ListOfSongs extends ChangeNotifier {
   List<Songs> songArray = [];
 
-  void uploadSonglistDariFetch({
-    required List<Songs> song,
-  }) async {
+  void uploadSonglistDariFetch() async {
+    List<Songs> song = await songFetch();
     for (var i = 0; i < song.length; i++) {
       songArray.add(Songs(
         id: song[i].id,
@@ -20,6 +20,7 @@ class ListOfSongs extends ChangeNotifier {
         song: song[i].song,
       ));
     }
+    notifyListeners();
   }
 
   void uploadSong({

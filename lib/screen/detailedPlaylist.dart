@@ -37,7 +37,7 @@ class _detailedPlaylistState extends State<detailedPlaylist> {
 
   void _initializeSongs() async {
     try {
-      await context.read<Playlist>().tambahLagukePlaylistDariFetch(
+      await context.read<UsersProvider>().tambahLagukePlaylistDariFetch(
           datas: await insidePlaylistFetch(), playlist: widget.iniPlaylist);
     } catch (e) {
       print("Error fetching songs: $e");
@@ -143,6 +143,27 @@ class _detailedPlaylistState extends State<detailedPlaylist> {
                         );
                       }
                     }),
+                    // itemCount: context
+                    //     .watch<UsersProvider>()
+                    //     .playListArr[widget.currIdx]
+                    //     .songList
+                    //     .length,
+                    // itemBuilder: ((context, index) {
+                    //   if (index <=
+                    //       context
+                    //           .watch<UsersProvider>()
+                    //           .playListArr[widget.currIdx]
+                    //           .songList
+                    //           .length) {
+                    //     return listPlaylistSong(
+                    //       iniplaylistSong: context
+                    //           .watch<UsersProvider>()
+                    //           .playListArr[widget.currIdx],
+                    //       CurrIdx: index,
+                    //       iniUsers: context.watch<UsersProvider>(),
+                    //     );
+                    //   }
+                    // }),
                   ),
                 )
               ],

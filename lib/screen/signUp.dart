@@ -203,9 +203,10 @@ class _signUpUserState extends State<singUp> {
                 ),
                 InkWell(
                   onTap: () async {
-                    try {
-                      if (_passwordTextController.text ==
-                          _confirmPasswordTextController.text) {
+                    if (_usernameTextController.text != "" &&
+                        _passwordTextController.text ==
+                            _confirmPasswordTextController.text) {
+                      try {
                         await FirebaseAuth.instance
                             .createUserWithEmailAndPassword(
                           email: _emailTextController.text.trim(),
@@ -232,29 +233,49 @@ class _signUpUserState extends State<singUp> {
                             builder: (context) => Home(),
                           ),
                         );
+                      } catch (error) {
+                        // Handle specific errors
+                        if (_emailTextController.text == "" &&
+                            _passwordTextController.text == "" &&
+                            _usernameTextController.text == "" &&
+                            _confirmPasswordTextController.text == "") {
+                          showAlertDialog(
+                              context, "You must fill in all the form fields!");
+                        } else if (_emailTextController.text == "") {
+                          showAlertDialog(context, "Email Cannot be Empty");
+                        } else if (_passwordTextController.text == "") {
+                          showAlertDialog(context, "Password Cannot be Empty");
+                        } else if (_passwordTextController.text !=
+                            _confirmPasswordTextController.text) {
+                          showAlertDialog(context, "Password not matched");
+                        } else {
+                          if (error is FirebaseAuthException) {
+                            if (error.code == 'invalid-email') {
+                              showAlertDialog(
+                                  context, "Email address is badly formatted");
+                            } else if (error.code == 'weak-password') {
+                              showAlertDialog(context,
+                                  "Password should be at least 6 characters");
+                            } else {
+                              // Handle other FirebaseAuthException errors if needed
+                              showAlertDialog(context,
+                                  "Registration failed. ${error.message}");
+                            }
+                          } else {
+                            // Handle other errors not related to FirebaseAuthException
+                            showAlertDialog(context,
+                                "Registration failed. ${error.toString()}");
+                          }
+                        }
+                      }
+                    } else {
+                      if (_usernameTextController.text == "") {
+                        showAlertDialog(context, "Username Cannot be Empty");
                       } else {
                         showAlertDialog(context, "Password not matched");
                       }
-                    } catch (error) {
-                      // Handle specific errors
-                      if (error is FirebaseAuthException) {
-                        if (error.code == 'invalid-email') {
-                          showAlertDialog(
-                              context, "Email address is badly formatted");
-                        } else if (error.code == 'weak-password') {
-                          showAlertDialog(context,
-                              "Password should be at least 6 characters");
-                        } else {
-                          // Handle other FirebaseAuthException errors if needed
-                          showAlertDialog(
-                              context, "Registration failed. ${error.message}");
-                        }
-                      } else {
-                        // Handle other errors not related to FirebaseAuthException
-                        showAlertDialog(context,
-                            "Registration failed. ${error.toString()}");
-                      }
                     }
+
                     // if (_passwordTextController.text ==
                     //     _confirmPasswordTextController.text) {
                     //   FirebaseAuth.instance
@@ -302,6 +323,7 @@ class _signUpUserState extends State<singUp> {
                     //       ),
                     //     );
                     //   }).onError((error, stackTrace) {
+                    //     print(error.toString());
                     //     if (error.toString() ==
                     //         "[firebase_auth/invalid-email] The email address is badly formatted.") {
                     //       showAlertDialog(
@@ -310,6 +332,9 @@ class _signUpUserState extends State<singUp> {
                     //         "[firebase_auth/weak-password] Password should be at least 6 characters") {
                     //       showAlertDialog(context,
                     //           "Password should be at least 6 characters");
+                    //     } else if (error.toString() ==
+                    //         "The email address is already in use by another account.") {
+                    //       showAlertDialog(context, "The Email Already Taken");
                     //     }
                     //   });
                     // } else {

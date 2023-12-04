@@ -1,21 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:stavax_new/firebaseFetch/artistSongFetch.dart';
 import 'package:stavax_new/firebaseFetch/playlistFetch.dart';
 import 'package:stavax_new/provider/classPlaylist.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:stavax_new/provider/classSong.dart';
 import 'package:stavax_new/provider/classListSongs.dart';
-import 'package:uuid/uuid.dart';
 import 'dart:io';
-
-import 'dart:io';
-import 'package:http/http.dart' as http;
-import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
 
 class UsersProvider extends ChangeNotifier {
   String id;
@@ -37,20 +30,6 @@ class UsersProvider extends ChangeNotifier {
     this.artistRole = true,
     this.listenerRole = true,
   });
-
-  void clearPlaylist() {
-    print("test");
-    print(playListArr.length);
-    playListArr.clear();
-    print("test");
-    print(playListArr.length);
-    notifyListeners();
-  }
-
-  void setid(String uid) {
-    this.id = uid;
-    print(id);
-  }
 
   void tambahPlaylistBaru({
     required String id,
@@ -91,9 +70,8 @@ class UsersProvider extends ChangeNotifier {
     }
   }
 
-  void tambahPlaylistDariFetch({
-    required List<Playlist> playlist,
-  }) async {
+  void tambahPlaylistDariFetch() async {
+    List<Playlist> playlist = await playlistFetch();
     for (var i = 0; i < playlist.length; i++) {
       playListArr.add(Playlist(
         id: playlist[i].id,
@@ -102,6 +80,7 @@ class UsersProvider extends ChangeNotifier {
         desc: playlist[i].desc,
         imageUrl: playlist[i].imageUrl,
       ));
+      notifyListeners();
     }
     // if (playListArr.isEmpty) {
     //   for (var i = 0; i < playlist.length; i++) {
@@ -531,9 +510,8 @@ class UsersProvider extends ChangeNotifier {
   //     notifyListeners();
   //   }
   // }
-  void uploadSongArtistlistDariFetch({
-    required List<Songs> song,
-  }) async {
+  void uploadSongArtistlistDariFetch() async {
+    List<Songs> song = await artistSongFetch();
     for (var i = 0; i < song.length; i++) {
       songArtist.add(Songs(
         id: song[i].id,
@@ -543,5 +521,6 @@ class UsersProvider extends ChangeNotifier {
         song: song[i].song,
       ));
     }
+    notifyListeners();
   }
 }
