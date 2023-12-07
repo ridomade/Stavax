@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:side_sheet/side_sheet.dart';
@@ -343,6 +344,11 @@ class _ProfileEditState extends State<ProfileEdit> {
   String userName = "";
   String email = "";
   late TextEditingController usernameController;
+  String image = "";
+  var filePath;
+  var fileName;
+  File? selectedImage;
+  String? selectedImageFileName;
 
   @override
   void initState() {
@@ -366,213 +372,127 @@ class _ProfileEditState extends State<ProfileEdit> {
     );
   }
 
+  Future<void> getImage() async {
+    final imagePicker = ImagePicker();
+    final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      final appDocDir = await getApplicationDocumentsDirectory();
+      final imageFileName = pickedFile.name;
+
+      // Convert XFile to File
+      final imageFile = File(pickedFile.path);
+      String filepath = imageFile.path;
+      // Create a destination File in the application's documents directory
+      final localImage = File('${appDocDir.path}/$imageFileName');
+
+      // Copy the File
+      try {
+        await imageFile.copy(localImage.path);
+        setState(() {
+          fileName = imageFileName;
+          filePath = filepath;
+          selectedImage = localImage;
+          selectedImageFileName = imageFileName;
+        });
+      } catch (e) {
+        print('Error copying file: $e');
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
-        child: isEditing
-            ? Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 40),
-                  Center(
-                    child: CircleAvatar(
-                      radius: 60,
-                      backgroundImage:
-                          AssetImage('assets/playlist1/playlist1_gambar2.jpg'),
+      child: isEditing
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: 40),
+                Stack(
+                  children: [
+                    InkWell(
+                        onTap: () async {
+                          await getImage();
+                        },
+                        child: selectedImage != null
+                            ? Center(
+                                child: CircleAvatar(
+                                  radius: 60,
+                                  backgroundImage: FileImage(
+                                      File(selectedImage!.path.toString())),
+                                ),
+                              )
+                            : Center(
+                                child: image != null
+                                    ? CircleAvatar(
+                                        radius: 60,
+                                        backgroundImage: FileImage(File(image)),
+                                      )
+                                    : CircleAvatar(
+                                        radius: 60,
+                                        backgroundImage: AssetImage(
+                                            'assets/playlist1/playlist1_gambar2.jpg'),
+                                      ))),
+                    Positioned(
+                      right: 55,
+                      bottom: 0,
+                      child: Icon(
+                        Icons.add_circle,
+                        size: 40,
+                        color: color3,
+                      ),
+                    )
+                  ],
+                ),
+                SizedBox(height: 22),
+                Text(
+                  "Username",
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white),
+                ),
+                SizedBox(
+                  height: 5,
+                ),
+                Container(
+                  width: double.infinity,
+                  height: 37,
+                  decoration: BoxDecoration(
+                    color: Color(0xff25303d),
+                  ),
+                  child: TextField(
+                    controller: usernameController,
+                    style: TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                      contentPadding:
+                          EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                      hintText: 'New Username',
+                      hintStyle: TextStyle(color: Colors.grey),
+                      border: InputBorder.none,
                     ),
                   ),
-                  SizedBox(height: 22),
-                  Text(
-                    "Username",
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white),
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Container(
-                    width: double.infinity,
-                    height: 37,
-                    decoration: BoxDecoration(
-                      color: Color(0xff25303d),
-                    ),
-                    child: TextField(
-                      controller: usernameController,
-                      style: TextStyle(color: Colors.white),
-                      decoration: InputDecoration(
-                        contentPadding:
-                            EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                        hintText: 'New Username',
-                        hintStyle: TextStyle(color: Colors.grey),
-                        border: InputBorder.none,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 15),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            isEditing = !isEditing;
-                          });
-                        },
-                        child: Container(
-                          width: 101,
-                          height: 36,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.red,
-                          ),
-                          child: Center(
-                            child: Text(
-                              "Close",
-                              style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.white),
-                            ),
-                          ),
-                        ),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            isEditing = !isEditing;
-                          });
-                          userName = usernameController.text;
-                          final userNameRef = db
-                              .collection("Users")
-                              .doc(FirebaseAuth.instance.currentUser!.uid);
-                          userNameRef.update({
-                            "userName": usernameController.text
-                          }).then(
-                              (value) => print(
-                                  "DocumentSnapshot successfully updated!"),
-                              onError: (e) =>
-                                  print("Error updating document $e"));
-                        },
-                        child: Container(
-                          width: 101,
-                          height: 36,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Color(0xff004e96),
-                          ),
-                          child: Center(
-                            child: Text(
-                              "Confirm",
-                              style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.white),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  )
-                ],
-              )
-            : Stack(
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      SizedBox(height: 40),
-                      CircleAvatar(
-                        radius: 60,
-                        backgroundImage: AssetImage(
-                            'assets/playlist1/playlist1_gambar2.jpg'),
-                      ),
-                      SizedBox(height: 22),
-                      Text(
-                        usernameController.text.isEmpty
-                            ? userName
-                            : usernameController
-                                .text, // Use the controller's text
-                        style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white),
-                      ),
-                      Text(
-                        email,
-                        style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.grey),
-                      ),
-                      SizedBox(height: 15),
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            isEditing = !isEditing;
-                          });
-                        },
-                        child: Container(
-                          width: double.infinity,
-                          height: 36,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Color(0xffd9d9d9),
-                          ),
-                          child: Center(
-                            child: Text(
-                              "Edit Profile",
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.w700),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    left: 0,
-                    child: InkWell(
-                      onTap: () async {
-                        context.read<UsersProvider>().playListArr = [];
-                        context.read<UsersProvider>().songArtist = [];
-                        context.read<ListOfSongs>().songArray = [];
-                        // print("ini panjang array of song");
-                        // print(context.read<ListOfSongs>().songArray);
-                        // for (var i = 0;
-                        //     i < context.read<ListOfSongs>().songArray.length;
-                        //     i++) {
-                        //   context
-                        //       .read<ListOfSongs>()
-                        //       .songArray
-                        //       .remove(context.read<ListOfSongs>().songArray[i]);
-                        // }
-                        // print(context.read<ListOfSongs>().songArray);
-                        // print("ini panjang playl");
-                        // print(context.read<UsersProvider>().playListArr);
-                        // context.read<UsersProvider>().playListArr.clear();
-                        // print(context.read<UsersProvider>().playListArr);
-                        FirebaseAuth.instance.signOut();
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => (loginAndSignUp()),
-                          ),
-                        );
+                ),
+                SizedBox(height: 15),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        setState(() {
+                          isEditing = !isEditing;
+                        });
                       },
                       child: Container(
-                        width: 222,
-                        height: 43,
+                        width: 101,
+                        height: 36,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
-                          color: Color(0xffff2020),
+                          color: Colors.red,
                         ),
                         child: Center(
                           child: Text(
-                            "Log out",
+                            "Close",
                             style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
@@ -581,9 +501,159 @@ class _ProfileEditState extends State<ProfileEdit> {
                         ),
                       ),
                     ),
+                    InkWell(
+                      onTap: () {
+                        setState(() {
+                          isEditing = !isEditing;
+                          image = selectedImage!.path.toString();
+                        });
+                        userName = usernameController.text;
+                        final userNameRef = db
+                            .collection("Users")
+                            .doc(FirebaseAuth.instance.currentUser!.uid);
+                        userNameRef
+                            .update({"userName": usernameController.text}).then(
+                                (value) => print(
+                                    "DocumentSnapshot successfully updated!"),
+                                onError: (e) =>
+                                    print("Error updating document $e"));
+                      },
+                      child: Container(
+                        width: 101,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Color(0xff004e96),
+                        ),
+                        child: Center(
+                          child: Text(
+                            "Confirm",
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            )
+          : Stack(
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(height: 40),
+                    Container(
+                        child: image != null
+                            ? CircleAvatar(
+                                radius: 60,
+                                backgroundImage: FileImage(File(image)),
+                              )
+                            : CircleAvatar(
+                                radius: 60,
+                                backgroundImage: AssetImage(
+                                    'assets/playlist1/playlist1_gambar2.jpg'),
+                              )),
+                    SizedBox(height: 22),
+                    Text(
+                      usernameController.text.isEmpty
+                          ? userName
+                          : usernameController
+                              .text, // Use the controller's text
+                      style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white),
+                    ),
+                    Text(
+                      email,
+                      style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey),
+                    ),
+                    SizedBox(height: 15),
+                    InkWell(
+                      onTap: () {
+                        setState(() {
+                          isEditing = !isEditing;
+                        });
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Color(0xffd9d9d9),
+                        ),
+                        child: Center(
+                          child: Text(
+                            "Edit Profile",
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.w700),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  left: 0,
+                  child: InkWell(
+                    onTap: () async {
+                      context.read<UsersProvider>().playListArr = [];
+                      context.read<UsersProvider>().songArtist = [];
+                      context.read<ListOfSongs>().songArray = [];
+                      // print("ini panjang array of song");
+                      // print(context.read<ListOfSongs>().songArray);
+                      // for (var i = 0;
+                      //     i < context.read<ListOfSongs>().songArray.length;
+                      //     i++) {
+                      //   context
+                      //       .read<ListOfSongs>()
+                      //       .songArray
+                      //       .remove(context.read<ListOfSongs>().songArray[i]);
+                      // }
+                      // print(context.read<ListOfSongs>().songArray);
+                      // print("ini panjang playl");
+                      // print(context.read<UsersProvider>().playListArr);
+                      // context.read<UsersProvider>().playListArr.clear();
+                      // print(context.read<UsersProvider>().playListArr);
+                      FirebaseAuth.instance.signOut();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => (loginAndSignUp()),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      width: 222,
+                      height: 43,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Color(0xffff2020),
+                      ),
+                      child: Center(
+                        child: Text(
+                          "Log out",
+                          style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white),
+                        ),
+                      ),
+                    ),
                   ),
-                ],
-              ));
+                ),
+              ],
+            ),
+    );
   }
 }
 
