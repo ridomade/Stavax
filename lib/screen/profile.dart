@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
@@ -18,6 +19,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:stavax_new/screen/loginAndSignUp.dart';
 import 'package:stavax_new/screen/main_screen.dart';
+import 'package:uuid/uuid.dart';
 
 class profile extends StatefulWidget {
   const profile({super.key});
@@ -379,6 +381,33 @@ class _ProfileEditState extends State<ProfileEdit> {
     );
   }
 
+  final FirebaseStorage firebaseStorage = FirebaseStorage.instance;
+  Future<void> uplaodImageFile(String fileName, String filePath) async {
+    File file = File(filePath);
+    final uuid = Uuid();
+    final uniqueId = uuid.v4();
+    fileName = uniqueId.toString() + fileName;
+    final imageref = firebaseStorage.ref('ImageProfile/$fileName');
+    try {
+      await imageref.putFile(
+          file,
+          SettableMetadata(
+            contentType: 'image/jpeg',
+          ));
+      var imageUrl = await imageref.getDownloadURL();
+      await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .collection("ProfileImage")
+          .add({
+        "profileImageUrl": imageUrl,
+        "profileImageName": fileName,
+      }).then((document) {});
+    } catch (e) {
+      print('Error copying file: $e');
+    }
+  }
+
   Future<void> getImage() async {
     final imagePicker = ImagePicker();
     final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
@@ -420,6 +449,7 @@ class _ProfileEditState extends State<ProfileEdit> {
                     InkWell(
                         onTap: () async {
                           await getImage();
+                          await uplaodImageFile(fileName, filePath);
                         },
                         child: selectedImage != null
                             ? Center(
@@ -510,20 +540,29 @@ class _ProfileEditState extends State<ProfileEdit> {
                     ),
                     InkWell(
                       onTap: () {
+                        print("test");
+                        print(selectedImage);
+                        if (selectedImage != null) {
+                          setState(() {
+                            image = selectedImage!.path.toString();
+                          });
+                        }
                         setState(() {
                           isEditing = !isEditing;
-                          image = selectedImage!.path.toString();
                         });
-                        userName = usernameController.text;
-                        final userNameRef = db
-                            .collection("Users")
-                            .doc(FirebaseAuth.instance.currentUser!.uid);
-                        userNameRef
-                            .update({"userName": usernameController.text}).then(
-                                (value) => print(
-                                    "DocumentSnapshot successfully updated!"),
-                                onError: (e) =>
-                                    print("Error updating document $e"));
+                        if (usernameController.text != "") {
+                          userName = usernameController.text;
+                          final userNameRef = db
+                              .collection("Users")
+                              .doc(FirebaseAuth.instance.currentUser!.uid);
+                          userNameRef.update({
+                            "userName": usernameController.text
+                          }).then(
+                              (value) => print(
+                                  "DocumentSnapshot successfully updated!"),
+                              onError: (e) =>
+                                  print("Error updating document $e"));
+                        }
                       },
                       child: Container(
                         width: 101,

@@ -52,9 +52,15 @@ class _HomeState extends State<Home> {
   void _initializeSongs() async {
     try {
       print("ini home");
+      context.read<ListOfSongs>().songArray = [];
       context.read<ListOfSongs>().uploadSonglistDariFetch();
+      context.read<UsersProvider>().songArtist = [];
       context.read<UsersProvider>().uploadSongArtistlistDariFetch();
+      context.read<UsersProvider>().playListArr = [];
       context.read<UsersProvider>().tambahPlaylistDariFetch();
+      context.read<UsersProvider>().setImageProfile();
+      print(context.read<UsersProvider>().profileImage);
+      print(context.read<UsersProvider>().profileImageUrl);
     } catch (e) {
       print("Error fetching songs: $e");
     }

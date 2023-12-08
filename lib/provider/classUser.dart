@@ -1,9 +1,14 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:stavax_new/firebaseFetch/artistSongFetch.dart';
+import 'package:stavax_new/firebaseFetch/insidePlaylistFetch.dart';
 import 'package:stavax_new/firebaseFetch/playlistFetch.dart';
+import 'package:stavax_new/firebaseFetch/profileImageFetch.dart';
+import 'package:stavax_new/firebaseFetch/songFetch.dart';
 import 'package:stavax_new/provider/classPlaylist.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:stavax_new/provider/classSong.dart';
@@ -16,6 +21,7 @@ class UsersProvider extends ChangeNotifier {
   String username;
   String password;
   String profileImage;
+  String profileImageUrl;
   bool artistRole;
   bool listenerRole;
   List<Playlist> playListArr = [];
@@ -27,6 +33,7 @@ class UsersProvider extends ChangeNotifier {
     this.username = "",
     this.password = "",
     this.profileImage = "",
+    this.profileImageUrl = "",
     this.artistRole = true,
     this.listenerRole = true,
   });
@@ -182,19 +189,6 @@ class UsersProvider extends ChangeNotifier {
 
   Future<void> tambahLagukePlaylist(
       {required Playlist playlist, required Songs song}) async {
-    // print(">>>>>>");
-    // print(playlist.id);
-    // print(playlist.name);
-    // print(playlist.image);
-    // print(playlist.desc);
-    // print(playlist.imageUrl);
-    // print(">>>>>>");
-    // print(song.id);
-    // print(song.title);
-    // print(song.artist);
-    // print(song.image);
-    // print(song.song);
-    // print(">>>>>>");
     playlist.songList.add(song);
     var songReference =
         FirebaseFirestore.instance.collection("Songs").doc(song.id);
@@ -228,7 +222,7 @@ class UsersProvider extends ChangeNotifier {
   }
 
   Future<void> tambahLagukePlaylistDariFetch({
-    required Map datas,
+    required Map<Playlist, dynamic> datas,
     required Playlist playlist,
   }) async {
     for (var key in datas.keys) {
@@ -238,10 +232,36 @@ class UsersProvider extends ChangeNotifier {
         }
       }
     }
+    print("Sukses tambah lagu dalam playlist");
   }
 
-  void hapusLagukePlaylist({required Playlist playlist, required Songs song}) {
+  Future<void> tambahLagukePlaylistDariFetch2() async {
+    final Map<Playlist, dynamic> datas = await insidePlaylistFetch();
+    for (var key in datas.keys) {
+      for (var value in datas[key]) {
+        print(key.name);
+        print(value.title);
+        key.songList.add(value);
+      }
+    }
+    print("Sukses tambah lagu dalam playlist");
+  }
+
+  Future<void> hapusLagukePlaylist(
+      {required Playlist playlist, required Songs song}) async {
+    var ref = FirebaseFirestore.instance.collection('Songs').doc(song.id);
+    var ref2 = FirebaseFirestore.instance
+        .collection('Users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection("Playlist")
+        .doc(playlist.id);
+
+    await ref2.update({
+      "song": FieldValue.arrayRemove([ref])
+    });
+
     playlist.songList.remove(song);
+    print("Behasil Hapus Lagu");
     notifyListeners();
   }
 
@@ -521,6 +541,19 @@ class UsersProvider extends ChangeNotifier {
         song: song[i].song,
       ));
     }
+    notifyListeners();
+  }
+
+  void setImageProfile() async {
+    Map<String, String> profileImages = await profileImageFetch();
+    for (var key in profileImages.keys) {
+      profileImage = key;
+      for (var value in profileImages.values) {
+        profileImageUrl = value;
+      }
+    }
+    print(profileImage);
+    print(profileImageUrl);
     notifyListeners();
   }
 }
