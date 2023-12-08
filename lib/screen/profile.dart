@@ -133,11 +133,17 @@ class _profileState extends State<profile> {
             ),
             Row(
               children: [
-                CircleAvatar(
-                  radius: 60, // Image radius
-                  backgroundImage:
-                      AssetImage('assets/playlist1/playlist1_gambar2.jpg'),
-                ),
+                Container(
+                    child: image != ""
+                        ? CircleAvatar(
+                            radius: 60,
+                            backgroundImage: FileImage(File(image)),
+                          )
+                        : CircleAvatar(
+                            radius: 60,
+                            backgroundImage: AssetImage(
+                                'assets/playlist1/playlist1_gambar2.jpg'),
+                          )),
                 SizedBox(
                   width: 33,
                 ),
@@ -333,6 +339,8 @@ class _profileState extends State<profile> {
   }
 }
 
+String image = "";
+
 class ProfileEdit extends StatefulWidget {
   @override
   _ProfileEditState createState() => _ProfileEditState();
@@ -344,7 +352,6 @@ class _ProfileEditState extends State<ProfileEdit> {
   String userName = "";
   String email = "";
   late TextEditingController usernameController;
-  String image = "";
   var filePath;
   var fileName;
   File? selectedImage;
