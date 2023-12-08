@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:stavax_new/firebaseFetch/artistSongFetch.dart';
 import 'package:stavax_new/firebaseFetch/insidePlaylistFetch.dart';
 import 'package:stavax_new/firebaseFetch/playlistFetch.dart';
+import 'package:stavax_new/firebaseFetch/profileImageFetch.dart';
 import 'package:stavax_new/firebaseFetch/songFetch.dart';
 import 'package:stavax_new/provider/classPlaylist.dart';
 import 'package:path_provider/path_provider.dart';
@@ -20,6 +21,7 @@ class UsersProvider extends ChangeNotifier {
   String username;
   String password;
   String profileImage;
+  String profileImageUrl;
   bool artistRole;
   bool listenerRole;
   List<Playlist> playListArr = [];
@@ -31,6 +33,7 @@ class UsersProvider extends ChangeNotifier {
     this.username = "",
     this.password = "",
     this.profileImage = "",
+    this.profileImageUrl = "",
     this.artistRole = true,
     this.listenerRole = true,
   });
@@ -538,6 +541,19 @@ class UsersProvider extends ChangeNotifier {
         song: song[i].song,
       ));
     }
+    notifyListeners();
+  }
+
+  void setImageProfile() async {
+    Map<String, String> profileImages = await profileImageFetch();
+    for (var key in profileImages.keys) {
+      profileImage = key;
+      for (var value in profileImages.values) {
+        profileImageUrl = value;
+      }
+    }
+    print(profileImage);
+    print(profileImageUrl);
     notifyListeners();
   }
 }
