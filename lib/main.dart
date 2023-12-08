@@ -61,7 +61,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Stavax',
         theme: ThemeData(fontFamily: 'Poppins'),
-        home: main_screen(), // Gantilah Home() dengan widget utama Anda
+        home: loginAndSignUp(), // Gantilah Home() dengan widget utama Anda
       ),
     );
   }

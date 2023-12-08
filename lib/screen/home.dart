@@ -53,8 +53,11 @@ class _HomeState extends State<Home> {
     try {
       print("ini home");
       context.read<ListOfSongs>().uploadSonglistDariFetch();
+      context.read<ListOfSongs>().songArray = [];
       context.read<UsersProvider>().uploadSongArtistlistDariFetch();
+      context.read<UsersProvider>().songArtist = [];
       context.read<UsersProvider>().tambahPlaylistDariFetch();
+      context.read<UsersProvider>().playListArr;
     } catch (e) {
       print("Error fetching songs: $e");
     }

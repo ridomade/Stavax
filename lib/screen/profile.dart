@@ -423,7 +423,7 @@ class _ProfileEditState extends State<ProfileEdit> {
                                 ),
                               )
                             : Center(
-                                child: image != null
+                                child: image != ""
                                     ? CircleAvatar(
                                         radius: 60,
                                         backgroundImage: FileImage(File(image)),
@@ -547,7 +547,7 @@ class _ProfileEditState extends State<ProfileEdit> {
                   children: [
                     SizedBox(height: 40),
                     Container(
-                        child: image != null
+                        child: image != ""
                             ? CircleAvatar(
                                 radius: 60,
                                 backgroundImage: FileImage(File(image)),

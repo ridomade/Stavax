@@ -7,8 +7,8 @@ import 'package:stavax_new/provider/classPlaylist.dart';
 import 'package:stavax_new/provider/classUser.dart';
 import '../provider/classSong.dart';
 
-Future<Map> insidePlaylistFetch() async {
-  var data = new Map();
+Future<Map<Playlist, dynamic>> insidePlaylistFetch() async {
+  var data = new Map<Playlist, dynamic>();
   await FirebaseFirestore.instance
       .collection('Users')
       .doc(FirebaseAuth.instance.currentUser!.uid)

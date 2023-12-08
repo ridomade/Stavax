@@ -31,6 +31,12 @@ class _detailedPlaylistState extends State<detailedPlaylist> {
   void initState() {
     if (widget.iniPlaylist.songList.isEmpty) {
       _initializeSongs();
+      // Refresh the page after 5 seconds
+      Future.delayed(Duration(seconds: 3), () {
+        setState(() {
+          // Trigger a rebuild of the widget tree
+        });
+      });
     }
     super.initState();
   }
@@ -143,6 +149,7 @@ class _detailedPlaylistState extends State<detailedPlaylist> {
                         );
                       }
                     }),
+
                     // itemCount: context
                     //     .watch<UsersProvider>()
                     //     .playListArr[widget.currIdx]
