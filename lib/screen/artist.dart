@@ -11,6 +11,9 @@ import 'package:stavax_new/provider/classSong.dart';
 import 'package:stavax_new/provider/classUser.dart';
 import 'package:stavax_new/screen/uploadSong.dart';
 
+String imageUrl = "";
+String imageProfileUrl = "";
+
 class artistscreen extends StatefulWidget {
   const artistscreen({super.key});
 
@@ -30,20 +33,25 @@ class _artistscreenState extends State<artistscreen> {
   }
 
   void getUser() {
-    final docRef =
-        db.collection("Users").doc(FirebaseAuth.instance.currentUser!.uid);
-    docRef.snapshots().listen(
-      (event) {
-        final source = (event.metadata.hasPendingWrites) ? "Local" : "Server";
+    setState(() {
+      userName = context.read<UsersProvider>().username;
+      email = context.read<UsersProvider>().email;
+      imageProfileUrl = context.read<UsersProvider>().profileImageUrl;
+    });
+    // final docRef =
+    //     db.collection("Users").doc(FirebaseAuth.instance.currentUser!.uid);
+    // docRef.snapshots().listen(
+    //   (event) {
+    //     final source = (event.metadata.hasPendingWrites) ? "Local" : "Server";
 
-        setState(() {
-          userName = event['userName'];
-          email = event['email'];
-        });
-        // userName = event['userName'];
-      },
-      onError: (error) => print("Listen failed: $error"),
-    );
+    //     setState(() {
+    //       userName = event['userName'];
+    //       email = event['email'];
+    //     });
+    //     // userName = event['userName'];
+    //   },
+    //   onError: (error) => print("Listen failed: $error"),
+    // );
   }
 
   @override
@@ -94,8 +102,10 @@ class _artistscreenState extends State<artistscreen> {
                     children: [
                       CircleAvatar(
                         radius: 60, // Image radius
-                        backgroundImage: AssetImage(
-                            'assets/playlist1/playlist1_gambar2.jpg'),
+                        backgroundImage:
+                            // AssetImage(
+                            //     'assets/playlist1/playlist1_gambar2.jpg'),
+                            NetworkImage(imageProfileUrl),
                       ),
                       SizedBox(
                         width: 33,

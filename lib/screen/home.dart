@@ -51,7 +51,6 @@ class _HomeState extends State<Home> {
 
   void _initializeSongs() async {
     try {
-      print("ini home");
       context.read<ListOfSongs>().songArray = [];
       context.read<ListOfSongs>().uploadSonglistDariFetch();
       context.read<UsersProvider>().songArtist = [];
@@ -59,8 +58,7 @@ class _HomeState extends State<Home> {
       context.read<UsersProvider>().playListArr = [];
       context.read<UsersProvider>().tambahPlaylistDariFetch();
       context.read<UsersProvider>().setImageProfile();
-      print(context.read<UsersProvider>().profileImage);
-      print(context.read<UsersProvider>().profileImageUrl);
+      context.read<UsersProvider>().getUser();
     } catch (e) {
       print("Error fetching songs: $e");
     }
@@ -71,8 +69,6 @@ class _HomeState extends State<Home> {
         db.collection("Users").doc(FirebaseAuth.instance.currentUser!.uid);
     docRef.snapshots().listen(
       (event) {
-        final source = (event.metadata.hasPendingWrites) ? "Local" : "Server";
-
         setState(() {
           userName = event['userName'];
         });

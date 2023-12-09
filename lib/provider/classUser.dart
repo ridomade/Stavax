@@ -379,117 +379,6 @@ class UsersProvider extends ChangeNotifier {
     }
   }
 
-  // Future<void> deleteSong({
-  //   required String id,
-  //   required String title,
-  //   required String artist,
-  //   required String image,
-  //   required String song,
-  // }) async {
-  //   print(songArr[0].id);
-  //   songArr.remove(Songs(
-  //     id: id,
-  //     title: title,
-  //     artist: artist,
-  //     image: image,
-  //     song: song,
-  //   ));
-  //   songArtist.remove(Songs(
-  //     id: id,
-  //     title: title,
-  //     artist: artist,
-  //     image: image,
-  //     song: song,
-  //   ));
-  //   print(songArr[0].id);
-
-  //   // print(File(id));
-  //   // print(title);
-  //   // print(artist);
-  //   // print(image);
-  //   // print(song);
-  //   var deletedSongCollection =
-  //       await FirebaseFirestore.instance.collection("Songs");
-
-  //   var deletedArtistSongCollection = await FirebaseFirestore.instance
-  //       .collection("Users")
-  //       .doc(FirebaseAuth.instance.currentUser!.uid)
-  //       .collection("ArtistSong");
-
-  //   deletedSongCollection.doc(id).get().then((DocumentSnapshot doc) async {
-  //     final data = doc.data() as Map<String, dynamic>;
-
-  //     await FirebaseStorage.instance
-  //         .ref()
-  //         .child("Song/Songs/" + data["songNameUrl"])
-  //         .delete();
-  //     await FirebaseStorage.instance
-  //         .ref()
-  //         .child("Song/Images/" + data["imageNameUrl"])
-  //         .delete();
-  //     await deletedSongCollection.doc(id).delete();
-  //     deletedArtistSongCollection
-  //         .where("song", isEqualTo: deletedSongCollection.doc(id))
-  //         .get()
-  //         .then((querySnapshot) async {
-  //       for (var docSnapshot in querySnapshot.docs) {
-  //         await deletedArtistSongCollection.doc(docSnapshot.id).delete();
-  //       }
-  //     });
-  //   });
-  //   notifyListeners();
-  //   print("berhasil Hapus Lagu");
-  // }
-
-  // void uploadSong({
-  //   required String title,
-  //   required String artist,
-  //   required File? image,
-  //   required String? selectedImageFileName,
-  //   required String song,
-  //   required String id,
-  //   required _ListOfSong listsong
-  // }) async {
-  //   if (title.isNotEmpty && image != null && selectedImageFileName != null) {
-  //     // Mendapatkan direktori dokumen aplikasi
-  //     final appDocDir = await getApplicationDocumentsDirectory();
-  //     final imageFileName =
-  //         selectedImageFileName; // Menggunakan nama file yang terpilih
-  //     final localImage = File("${appDocDir.path}/$imageFileName");
-  //     // Mengecek apakah file lokal ada
-  //     if (await localImage.exists()) {
-  //       // File lokal ada, Anda bisa menggunakan localImage untuk mengaksesnya
-  //       // Tambahkan playlist baru dengan path gambar lokal
-  //       _listofSong.songArray.add(Songs(
-  //         id: id,
-  //         title: title,
-  //         artist: artist,
-  //         image: localImage.path,
-  //         song: song,
-  //       ));
-  //       songArtist.add(Songs(
-  //         id: id,
-  //         title: title,
-  //         artist: artist,
-  //         image: localImage.path,
-  //         song: song,
-  //       ));
-
-  //       // print(id);
-  //       // print(title);
-  //       // print(artist);
-  //       // print(image);
-  //       // print(song);
-  //       notifyListeners();
-  //       // Bersihkan input setelah menambah playlist baru
-  //       // Lakukan tindakan lain setelah berhasil menambahkan playlist
-  //     } else {
-  //       // File lokal tidak ditemukan, Anda perlu menanganinya sesuai kebutuhan Anda
-  //       print('File lokal tidak ditemukan.');
-  //     }
-  //   }
-  // }
-
   void uploadSong2({
     required String id,
     required String title,
@@ -511,25 +400,6 @@ class UsersProvider extends ChangeNotifier {
     }
   }
 
-  // void uploadSong3({
-  //   required String id,
-  //   required String title,
-  //   required String artist,
-  //   required String image,
-  //   required String selectedImageFileName,
-  //   required String song,
-  // }) async {
-  //   if (title.isNotEmpty && image != null && selectedImageFileName != null) {
-  //     songArtist.add(Songs(
-  //       id: id,
-  //       title: title,
-  //       artist: artist,
-  //       image: image,
-  //       song: song,
-  //     ));
-  //     notifyListeners();
-  //   }
-  // }
   void uploadSongArtistlistDariFetch() async {
     List<Songs> song = await artistSongFetch();
     for (var i = 0; i < song.length; i++) {
@@ -552,8 +422,22 @@ class UsersProvider extends ChangeNotifier {
         profileImageUrl = value;
       }
     }
-    print(profileImage);
-    print(profileImageUrl);
     notifyListeners();
+  }
+
+  void getUser() async {
+    print("aaa");
+    final docRef = FirebaseFirestore.instance
+        .collection("Users")
+        .doc(FirebaseAuth.instance.currentUser!.uid);
+    docRef.snapshots().listen(
+      (event) {
+        username = event['userName'];
+        email = event['email'];
+        artistRole = event['artistRole'];
+        // userName = event['userName'];
+      },
+      onError: (error) => print("Listen failed: $error"),
+    );
   }
 }

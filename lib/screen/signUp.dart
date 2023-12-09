@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:stavax_new/provider/classUser.dart';
 import 'package:stavax_new/screen/home.dart';
+import 'package:stavax_new/screen/profile.dart';
 import '../widgets/resuablePopUp.dart';
 
 class singUp extends StatefulWidget {
@@ -221,11 +222,13 @@ class _signUpUserState extends State<singUp> {
                           'email': _emailTextController.text,
                           'artistRole': false,
                           'listenerRole': true,
+                          "profileImageUrl":
+                              "https://firebasestorage.googleapis.com/v0/b/stavax-new.appspot.com/o/ImageProfile%2Fdefault_profile_photo.jpg?alt=media&token=99100ee8-4aa1-4f46-916e-2e2cbe6b8f06",
+                          "profileImageName": "default"
                         };
                         cities
                             .doc(FirebaseAuth.instance.currentUser!.uid)
                             .set(data);
-
                         print("Berhasil buat akun");
                         Navigator.push(
                           context,

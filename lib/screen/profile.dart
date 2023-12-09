@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -21,6 +22,16 @@ import 'package:stavax_new/screen/loginAndSignUp.dart';
 import 'package:stavax_new/screen/main_screen.dart';
 import 'package:uuid/uuid.dart';
 
+String userName = " ";
+String email = " ";
+String image = "";
+var filePath;
+var fileName;
+File? selectedImage;
+String? selectedImageFileName;
+
+String imageProfileUrl = "";
+
 class profile extends StatefulWidget {
   const profile({super.key});
 
@@ -30,8 +41,7 @@ class profile extends StatefulWidget {
 
 class _profileState extends State<profile> {
   final db = FirebaseFirestore.instance;
-  String userName = " ";
-  String email = " ";
+
   bool artistRole = false;
 
   @override
@@ -41,21 +51,28 @@ class _profileState extends State<profile> {
   }
 
   void getUser() {
-    final docRef =
-        db.collection("Users").doc(FirebaseAuth.instance.currentUser!.uid);
-    docRef.snapshots().listen(
-      (event) {
-        final source = (event.metadata.hasPendingWrites) ? "Local" : "Server";
-
-        setState(() {
-          userName = event['userName'];
-          email = event['email'];
-          artistRole = event['artistRole'];
-        });
-        // userName = event['userName'];
-      },
-      onError: (error) => print("Listen failed: $error"),
-    );
+    print("aaa");
+    print(context.read<UsersProvider>().username);
+    print(context.read<UsersProvider>().email);
+    setState(() {
+      userName = context.read<UsersProvider>().username;
+      email = context.read<UsersProvider>().email;
+      artistRole = context.read<UsersProvider>().artistRole;
+      imageProfileUrl = context.read<UsersProvider>().profileImageUrl;
+    });
+    // final docRef =
+    //     db.collection("Users").doc(FirebaseAuth.instance.currentUser!.uid);
+    // docRef.snapshots().listen(
+    //   (event) {
+    //     setState(() {
+    //       userName = event['userName'];
+    //       email = event['email'];
+    //       artistRole = event['artistRole'];
+    //     });
+    //     // userName = event['userName'];
+    //   },
+    //   onError: (error) => print("Listen failed: $error"),
+    // );
   }
 
   @override
@@ -136,16 +153,20 @@ class _profileState extends State<profile> {
             Row(
               children: [
                 Container(
-                    child: image != ""
-                        ? CircleAvatar(
-                            radius: 60,
-                            backgroundImage: FileImage(File(image)),
-                          )
-                        : CircleAvatar(
-                            radius: 60,
-                            backgroundImage: AssetImage(
-                                'assets/playlist1/playlist1_gambar2.jpg'),
-                          )),
+                    child:
+                        // image != ""
+                        //     ? CircleAvatar(
+                        //         radius: 60,
+                        //         backgroundImage: FileImage(File(image)),
+                        //       )
+                        //     :
+                        CircleAvatar(
+                  radius: 60,
+                  backgroundImage:
+                      // AssetImage(
+                      //     'assets/playlist1/playlist1_gambar2.jpg'),
+                      NetworkImage(imageProfileUrl),
+                )),
                 SizedBox(
                   width: 33,
                 ),
@@ -341,8 +362,6 @@ class _profileState extends State<profile> {
   }
 }
 
-String image = "";
-
 class ProfileEdit extends StatefulWidget {
   @override
   _ProfileEditState createState() => _ProfileEditState();
@@ -351,34 +370,12 @@ class ProfileEdit extends StatefulWidget {
 class _ProfileEditState extends State<ProfileEdit> {
   bool isEditing = false;
   final db = FirebaseFirestore.instance;
-  String userName = "";
-  String email = "";
   late TextEditingController usernameController;
-  var filePath;
-  var fileName;
-  File? selectedImage;
-  String? selectedImageFileName;
 
   @override
   void initState() {
     super.initState();
-    getUser();
     usernameController = TextEditingController(text: userName);
-  }
-
-  void getUser() {
-    final docRef =
-        db.collection("Users").doc(FirebaseAuth.instance.currentUser!.uid);
-    docRef.snapshots().listen(
-      (event) {
-        setState(() {
-          userName = event['userName'];
-          email = event['email'];
-        });
-        // userName = event['userName'];
-      },
-      onError: (error) => print("Listen failed: $error"),
-    );
   }
 
   final FirebaseStorage firebaseStorage = FirebaseStorage.instance;
@@ -398,11 +395,17 @@ class _ProfileEditState extends State<ProfileEdit> {
       await FirebaseFirestore.instance
           .collection('Users')
           .doc(FirebaseAuth.instance.currentUser!.uid)
-          .collection("ProfileImage")
-          .add({
+          .update({
         "profileImageUrl": imageUrl,
-        "profileImageName": fileName,
-      }).then((document) {});
+        "profileImageName": fileName
+      }).then((document) {
+        context.read<UsersProvider>().profileImageUrl = imageUrl;
+        setState(() {
+          print(imageProfileUrl);
+          imageProfileUrl = imageUrl;
+          print(imageProfileUrl);
+        });
+      });
     } catch (e) {
       print('Error copying file: $e');
     }
@@ -449,7 +452,6 @@ class _ProfileEditState extends State<ProfileEdit> {
                     InkWell(
                         onTap: () async {
                           await getImage();
-                          await uplaodImageFile(fileName, filePath);
                         },
                         child: selectedImage != null
                             ? Center(
@@ -467,8 +469,10 @@ class _ProfileEditState extends State<ProfileEdit> {
                                       )
                                     : CircleAvatar(
                                         radius: 60,
-                                        backgroundImage: AssetImage(
-                                            'assets/playlist1/playlist1_gambar2.jpg'),
+                                        backgroundImage:
+                                            // AssetImage(
+                                            //     'assets/playlist1/playlist1_gambar2.jpg'),
+                                            NetworkImage(imageProfileUrl),
                                       ))),
                     Positioned(
                       right: 55,
@@ -539,18 +543,20 @@ class _ProfileEditState extends State<ProfileEdit> {
                       ),
                     ),
                     InkWell(
-                      onTap: () {
-                        print("test");
-                        print(selectedImage);
+                      onTap: () async {
+                        setState(() {
+                          isEditing = !isEditing;
+                        });
                         if (selectedImage != null) {
                           setState(() {
                             image = selectedImage!.path.toString();
                           });
+                          await uplaodImageFile(fileName, filePath);
+                          print("berhasil set dan update imageprofile");
                         }
-                        setState(() {
-                          isEditing = !isEditing;
-                        });
+
                         if (usernameController.text != "") {
+                          print("berhasil set dan update username");
                           userName = usernameController.text;
                           final userNameRef = db
                               .collection("Users")
@@ -600,8 +606,10 @@ class _ProfileEditState extends State<ProfileEdit> {
                               )
                             : CircleAvatar(
                                 radius: 60,
-                                backgroundImage: AssetImage(
-                                    'assets/playlist1/playlist1_gambar2.jpg'),
+                                backgroundImage:
+                                    // AssetImage(
+                                    //     'assets/playlist1/playlist1_gambar2.jpg'),
+                                    NetworkImage(imageProfileUrl),
                               )),
                     SizedBox(height: 22),
                     Text(

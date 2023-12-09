@@ -5,20 +5,21 @@ import 'package:stavax_new/provider/classUser.dart';
 import '../provider/classSong.dart';
 
 Future<Map<String, String>> profileImageFetch() async {
-  var profileImage = new Map<String, String>();
-  await FirebaseFirestore.instance
-      .collection('Users')
-      .doc(FirebaseAuth.instance.currentUser!.uid)
-      .collection("ProfileImage")
-      .get()
-      .then(
-    (querySnapshot) {
-      for (var docSnapshot in querySnapshot.docs) {
-        profileImage[docSnapshot.data()["profileImageName"]] =
-            docSnapshot.data()["profileImageUrl"];
-      }
-    },
-    onError: (e) => print("Error completing: $e"),
-  );
+  Map<String, String> profileImage = {};
+
+  try {
+    var snapshot = await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .get();
+
+    if (snapshot.exists) {
+      var data = snapshot.data() as Map<String, dynamic>;
+      profileImage[data['profileImageName']] = data['profileImageUrl'];
+    }
+  } catch (error) {
+    print("Error fetching profile image: $error");
+  }
+
   return profileImage;
 }
