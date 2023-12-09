@@ -8,6 +8,7 @@ import 'package:stavax_new/screen/loginAndSignUp.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:stavax_new/screen/main_screen.dart';
 import 'firebase_options.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 // WidgetsFlutterBinding.ensureInitialized();
 // await Firebase.initializeApp(
@@ -38,6 +39,7 @@ Future<void> main() async {
   // }
 
   runApp(const MyApp());
+  configLoading();
 }
 
 class MyApp extends StatelessWidget {
@@ -61,8 +63,19 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Stavax',
         theme: ThemeData(fontFamily: 'Poppins'),
-        home: MainScreen(), // Gantilah Home() dengan widget utama Anda
+        home: loginAndSignUp(), // Gantilah Home() dengan widget utama Anda
+        builder: EasyLoading.init(),
       ),
     );
   }
+}
+
+void configLoading() {
+  EasyLoading.instance
+    ..displayDuration =
+        const Duration(seconds: 3) // Set the display duration to 3 seconds
+    ..indicatorType = EasyLoadingIndicatorType.fadingCircle
+    ..loadingStyle = EasyLoadingStyle.dark
+    ..maskColor = Colors.blue.withOpacity(0.5)
+    ..userInteractions = false;
 }

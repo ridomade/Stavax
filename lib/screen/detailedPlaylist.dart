@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:provider/provider.dart';
 import 'package:stavax_new/firebaseFetch/artistSongFetch.dart';
 import 'package:stavax_new/firebaseFetch/insidePlaylistFetch.dart';
@@ -28,20 +29,46 @@ class detailedPlaylist extends StatefulWidget {
 
 class _detailedPlaylistState extends State<detailedPlaylist> {
   @override
+  // void initState() {
+  //   if (widget.iniPlaylist.songList.isEmpty) {
+  //     _initializeSongs();
+  //     // Refresh the page after 5 seconds
+  //     refreshPage().whenComplete(() {
+  //     _hideLoading(); // Hide the loading indicator when the operation is complete
+  //   });
+  //   }
+  //   super.initState();
+  // }
   void initState() {
+    super.initState();
+
     if (widget.iniPlaylist.songList.isEmpty) {
-      _initializeSongs();
-      // Refresh the page after 5 seconds
-      Future.delayed(Duration(seconds: 3), () {
-        setState(() {
-          // Trigger a rebuild of the widget tree
+      _showLoading(); // Show the loading indicator
+      _initializeSongs().whenComplete(() {
+        refreshPage().whenComplete(() {
+          _hideLoading(); // Hide the loading indicator after the page is refreshed
         });
       });
     }
-    super.initState();
   }
 
-  void _initializeSongs() async {
+  Future<void> refreshPage() async {
+    await Future.delayed(Duration(seconds: 3), () {
+      setState(() {
+        // Trigger a rebuild of the widget tree
+      });
+    });
+  }
+
+  void _showLoading() {
+    EasyLoading.show();
+  }
+
+  void _hideLoading() {
+    EasyLoading.dismiss();
+  }
+
+  Future<void> _initializeSongs() async {
     try {
       await context.read<UsersProvider>().tambahLagukePlaylistDariFetch(
           datas: await insidePlaylistFetch(), playlist: widget.iniPlaylist);
@@ -49,6 +76,15 @@ class _detailedPlaylistState extends State<detailedPlaylist> {
       print("Error fetching songs: $e");
     }
   }
+
+  // void _initializeSongs() async {
+  //   try {
+  //     await context.read<UsersProvider>().tambahLagukePlaylistDariFetch(
+  //         datas: await insidePlaylistFetch(), playlist: widget.iniPlaylist);
+  //   } catch (e) {
+  //     print("Error fetching songs: $e");
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {

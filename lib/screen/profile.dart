@@ -167,6 +167,19 @@ class _profileState extends State<profile> {
                       //     'assets/playlist1/playlist1_gambar2.jpg'),
                       NetworkImage(imageProfileUrl),
                 )),
+                // Container(
+                //     child: image != ""
+                //         ? CircleAvatar(
+                //             radius: 60,
+                //             backgroundImage: FileImage(File(image)),
+                //           )
+                //         : CircleAvatar(
+                //             radius: 60,
+                //             backgroundImage:
+                //                 // AssetImage(
+                //                 //     'assets/playlist1/playlist1_gambar2.jpg'),
+                //                 NetworkImage(imageProfileUrl),
+                //           )),
                 SizedBox(
                   width: 33,
                 ),
