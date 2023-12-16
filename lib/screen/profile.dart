@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
@@ -18,6 +19,7 @@ import 'package:stavax_new/screen/detailedPlaylist.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:stavax_new/screen/home.dart';
 import 'package:stavax_new/screen/loginAndSignUp.dart';
 import 'package:stavax_new/screen/main_screen.dart';
 import 'package:uuid/uuid.dart';
@@ -391,6 +393,14 @@ class _ProfileEditState extends State<ProfileEdit> {
     usernameController = TextEditingController(text: userName);
   }
 
+  void _showLoading() {
+    EasyLoading.show();
+  }
+
+  void _hideLoading() {
+    EasyLoading.dismiss();
+  }
+
   final FirebaseStorage firebaseStorage = FirebaseStorage.instance;
   Future<void> uplaodImageFile(String fileName, String filePath) async {
     File file = File(filePath);
@@ -557,6 +567,7 @@ class _ProfileEditState extends State<ProfileEdit> {
                     ),
                     InkWell(
                       onTap: () async {
+                        _showLoading();
                         setState(() {
                           isEditing = !isEditing;
                         });
@@ -582,6 +593,11 @@ class _ProfileEditState extends State<ProfileEdit> {
                               onError: (e) =>
                                   print("Error updating document $e"));
                         }
+                        _hideLoading();
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => Home()),
+                        );
                       },
                       child: Container(
                         width: 101,

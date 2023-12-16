@@ -3,15 +3,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:provider/provider.dart';
-import 'package:stavax_new/firebaseFetch/artistSongFetch.dart';
 import 'package:stavax_new/firebaseFetch/insidePlaylistFetch.dart';
-import 'package:stavax_new/firebaseFetch/playlistFetch.dart';
-import 'package:stavax_new/firebaseFetch/songFetch.dart';
 import '../constants/colors.dart';
 import '../screen/addtoplaylist.dart';
 import '../screen/musicplayer.dart';
 import '../provider/classPlaylist.dart';
-import '../provider/classSong.dart';
 import '../provider/classUser.dart';
 
 late UsersProvider usersProvider;

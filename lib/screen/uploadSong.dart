@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -56,6 +57,14 @@ class _uploadSongState extends State<uploadSong> {
 
   var imageNameUrl;
   var songNameUrl;
+  void _showLoading() {
+    EasyLoading.show();
+  }
+
+  void _hideLoading() {
+    EasyLoading.dismiss();
+  }
+
   Future<void> uplaodSongFile(String fileName, String filePath) async {
     File file = File(filePath);
     final uuid = Uuid();
@@ -351,6 +360,7 @@ class _uploadSongState extends State<uploadSong> {
               children: [
                 InkWell(
                   onTap: () async {
+                    _showLoading();
                     if (_imageFileName != null &&
                         _imagePath != null &&
                         _songFileName != null &&
@@ -418,6 +428,7 @@ class _uploadSongState extends State<uploadSong> {
                       showAlertDialog(
                           context, "The Song and Image Cannot be Empty");
                     }
+                    _hideLoading();
                   },
                   child: Container(
                     width: 94,
