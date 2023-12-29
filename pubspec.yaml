@@ -57,6 +57,8 @@ dependencies:
   async: ^2.11.0
 
 dev_dependencies:
+  pedantic: 1.11.1
+  dart_code_metrics: ^5.0.0
   flutter_test:
     sdk: flutter
 

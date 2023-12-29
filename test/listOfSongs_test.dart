@@ -7,12 +7,11 @@ import 'package:mockito/mockito.dart';
 import 'package:stavax_new/firebaseFetch/songFetch.dart';
 import 'dart:io';
 import 'package:async/async.dart';
+import 'package:stavax_new/screen/detailedPlaylist.dart';
 
 class MockDirectory extends Mock implements Directory {}
 
 class MockFile extends Mock implements File {}
-
-class MockListOfSongs extends Mock implements ListOfSongs {}
 
 class MockSongsProvider extends Mock implements ListOfSongs {}
 
@@ -38,7 +37,7 @@ void main() {
       expect(listOfSongs.songArray, isEmpty);
     });
 
-     test('hapusLaguBener notifies listeners after removing a song', () {
+    test('hapusLaguBener notifies listeners after removing a song', () {
       // Arrange
       final ListOfSongs listOfSongs = ListOfSongs();
       final Songs songToRemove = Songs(
@@ -99,36 +98,61 @@ void main() {
       expect(listOfSongs.songArray.first.title, 'Song Title 2');
     });
 
-    test('uploadSong2 adds a song to the songArray if conditions are met', () async {
-    // Arrange
-    final String id = '1';
-    final String title = 'Song Title';
-    final String artist = 'Artist Name';
-    final String image = 'image.jpg';
-    final String selectedImageFileName = 'selected_image.jpg';
-    final String song = 'song.mp3';
+    test(
+        'uploadSong adds a new song to songArray when all parameters are valid',
+        () async {
+      // Create an instance of ListOfSongs and initialize the function parameters
+      final listOfSongs = ListOfSongs();
+      final title = 'Sample Title';
+      final artist = 'Sample Artist';
+      final image = File('assets/1.png');
+      final selectedImageFileName = '1.png';
+      final song = 'assets/505.mp3';
+      final id = '1';
 
-    final ListOfSongs listOfSongs = ListOfSongs(); // Create an instance of ListOfSongs
+      // Call the function
+      listOfSongs.uploadSong(
+        title: title,
+        artist: artist,
+        image: image,
+        selectedImageFileName: selectedImageFileName,
+        song: song,
+        id: id,
+      );
 
-    // Act
-    listOfSongs.uploadSong2(
-      id: id,
-      title: title,
-      artist: artist,
-      image: image,
-      selectedImageFileName: selectedImageFileName,
-      song: song,
-    );
+      // Verify that the song has been added to songArray
+      expect(listOfSongs.songArray[-1].id, id);
+      expect(listOfSongs.songArray[-1].title, title);
+      expect(listOfSongs.songArray[-1].artist, artist);
+      expect(listOfSongs.songArray[-1].image, contains(selectedImageFileName));
+      expect(listOfSongs.songArray[-1].song, song);
 
-    // Assert
-    expect(listOfSongs.songArray.length, 1); // Expect the songArray to have one element after the upload
-    expect(listOfSongs.songArray[0].id, id);
-    expect(listOfSongs.songArray[0].title, title);
-    expect(listOfSongs.songArray[0].artist, artist);
-    expect(listOfSongs.songArray[0].image, isNotNull);
-    expect(listOfSongs.songArray[0].song, song);
-  });
+      // Clean up: Delete the created image file
+      final appDocDir = await getApplicationDocumentsDirectory();
+      final localImage = File("${appDocDir.path}/$selectedImageFileName");
+      if (await localImage.exists()) {
+        await localImage.delete();
+      }
+    });
+    test('uploadSonglistDariFetch add songs to songList', () async {
+      final listOfSongs = ListOfSongs();
+      List<Songs> testSongArray = [];
 
-    
+      List<Songs> song = await songFetch();
+      for (var i = 0; i < song.length; i++) {
+        testSongArray.add(Songs(
+          id: song[i].id,
+          title: song[i].title,
+          artist: song[i].artist,
+          image: song[i].image,
+          song: song[i].song,
+        ));
+      }
+      List<Songs> testSongArrayDari = [];
+      listOfSongs.songArray = testSongArrayDari;
+      listOfSongs.uploadSonglistDariFetch();
+
+      expect(testSongArray.length, testSongArrayDari.length);
+    });
   });
 }
