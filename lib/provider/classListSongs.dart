@@ -112,12 +112,44 @@ class ListOfSongs extends ChangeNotifier {
     notifyListeners();
   }
 
-  // void filterSongs(String searchString) {
-  //   final filteredSongs = songArray
-  //       .where((song) =>
-  //           song.title.toLowerCase().contains(searchString.toLowerCase()))
-  //       .toList();
-  //   songArray = filteredSongs;
-  //   notifyListeners();
+  void filterSongs(String searchString) {
+    final filteredSongs = songArray
+        .where((song) =>
+            song.title.toLowerCase().contains(searchString.toLowerCase()))
+        .toList();
+    songArray = filteredSongs;
+    notifyListeners();
+  }
+
+  // Future<bool> uploadSongTest({
+  //   required String title,
+  //   required String artist,
+  //   required File? image,
+  //   required String? selectedImageFileName,
+  //   required String song,
+  //   required String id,
+  // }) async {
+  //   if (title.isNotEmpty && image != null && selectedImageFileName != null) {
+  //     final appDocDir = await getApplicationDocumentsDirectory();
+  //     final imageFileName = selectedImageFileName;
+  //     final localImage = File("${appDocDir.path}/$imageFileName");
+
+  //     if (await localImage.exists()) {
+  //       songArray.add(Songs(
+  //         id: id,
+  //         title: title,
+  //         artist: artist,
+  //         image: localImage.path,
+  //         song: song,
+  //       ));
+  //       notifyListeners();
+  //       return true;
+  //     } else {
+  //       print('File lokal tidak ditemukan.');
+  //       return false;
+  //     }
+  //   }
+
+  //   return false;
   // }
 }
