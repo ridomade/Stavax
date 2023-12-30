@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:provider/provider.dart';
 import 'package:stavax_new/constants/colors.dart';
 import 'package:stavax_new/provider/classListSongs.dart';
@@ -26,6 +27,14 @@ class _loginState extends State<login> {
   void initState() {
     super.initState();
     initializeFirestore();
+  }
+
+  void _showLoading() {
+    EasyLoading.show();
+  }
+
+  void _hideLoading() {
+    EasyLoading.dismiss();
   }
 
   Future<void> initializeFirestore() async {
@@ -160,7 +169,7 @@ class _loginState extends State<login> {
                   onTap: () async {
                     // tampilkan semua lagu dalam playlist
                     // await context.read<UsersProvider>().tambahLagukePlaylist2();
-
+                    _showLoading();
                     if (_emailTextController.text != "" &&
                         _passwordTextController.text != "") {
                       try {
@@ -194,78 +203,7 @@ class _loginState extends State<login> {
                         showAlertDialog(context, "Email Cannot be Empty!");
                       }
                     }
-
-                    // tampilkan playlist per user
-                    //   await db
-                    //       .collection('Users')
-                    //       .doc(FirebaseAuth.instance.currentUser!.uid)
-                    //       .collection("Playlist")
-                    //       .get()
-                    //       .then(
-                    //     (querySnapshot) {
-                    //       for (var docSnapshot in querySnapshot.docs) {
-                    //         context.read<UsersProvider>().tambahPlaylistBaru2(
-                    //               id: docSnapshot.id,
-                    //               namePlaylist:
-                    //                   docSnapshot.data()['namePlaylist'],
-                    //               descPlaylist:
-                    //                   docSnapshot.data()['descPlaylist'],
-                    //               selectedImage: docSnapshot.data()['imageUrl'],
-                    //               selectedImageFileName:
-                    //                   docSnapshot.data()['imageName'],
-                    //               imageUrll: docSnapshot.data()['imageUrl'],
-                    //             );
-                    //       }
-                    //     },
-                    //     onError: (e) => print("Error completing: $e"),
-                    //   );
-
-                    // tampikan semua lagu milik artis
-                    // await db
-                    //     .collection('Users')
-                    //     .doc(FirebaseAuth.instance.currentUser!.uid)
-                    //     .collection("ArtistSong")
-                    //     .get()
-                    //     .then(
-                    //   (querySnapshot) async {
-                    //     for (var docSnapshot in querySnapshot.docs) {
-                    //       DocumentReference<Map<String, dynamic>>
-                    //           favoriteSongRef = docSnapshot.data()["song"];
-                    //       var adder = await favoriteSongRef.get();
-                    //       context.read<UsersProvider>().uploadSong3(
-                    //             id: adder.id,
-                    //             title: adder['songTitle'],
-                    //             //nama yang upload
-                    //             artist: adder['artistName'],
-                    //             image: adder['imageUrl'],
-                    //             selectedImageFileName: adder['songTitle'],
-                    //             // download url song
-                    //             song: adder['songUrl'],
-                    //           );
-                    //     }
-                    //   },
-                    //   onError: (e) => print("Error completing: $e"),
-                    // );
-                    // tampilkan semua lagu yang ada
-                    // await db.collection('Songs').get().then(
-                    //   (querySnapshot) {
-                    //     for (var docSnapshot in querySnapshot.docs) {
-                    //       context.read<UsersProvider>().uploadSong2(
-                    //             id: docSnapshot.id,
-                    //             title: docSnapshot.data()['songTitle'],
-                    //             //nama yang upload
-                    //             artist: docSnapshot.data()['artistName'],
-                    //             image: docSnapshot.data()['imageUrl'],
-                    //             selectedImageFileName:
-                    //                 docSnapshot.data()['songTitle'],
-                    //             // download url song
-                    //             song: docSnapshot.data()['songUrl'],
-                    //           );
-                    //       print("Song login Sesudah $songArr");
-                    //     }
-                    //   },
-                    //   onError: (e) => print("Error completing: $e"),
-                    // );
+                    _hideLoading();
                   },
                   child: Container(
                     width: 94,

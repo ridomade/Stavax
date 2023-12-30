@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:stavax_new/model/uploadToFirebase.dart';
 import 'package:stavax_new/provider/classUser.dart';
 import 'package:stavax_new/widgets/resuablePopUp.dart';
@@ -71,6 +72,14 @@ class _makePlaylistState extends State<makePlaylist> {
     } catch (e) {
       print('Error copying file: $e');
     }
+  }
+
+  void _showLoading() {
+    EasyLoading.show();
+  }
+
+  void _hideLoading() {
+    EasyLoading.dismiss();
   }
 
   Future<void> getImage() async {
@@ -254,6 +263,7 @@ class _makePlaylistState extends State<makePlaylist> {
             Center(
               child: InkWell(
                 onTap: () async {
+                  _showLoading();
                   if (namePlaylist.text.isEmpty) {
                     showAlertDialog(
                         context, "The Playlist Name Cannot be Empty");
@@ -276,6 +286,7 @@ class _makePlaylistState extends State<makePlaylist> {
                         );
                     Navigator.pop(context);
                   }
+                  _hideLoading();
                 },
                 child: Container(
                   width: 94,

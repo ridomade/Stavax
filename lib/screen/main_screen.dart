@@ -27,7 +27,9 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:provider/provider.dart';
+import 'package:stavax_new/provider/classListSongs.dart';
 import 'package:stavax_new/provider/classUser.dart';
 import 'package:stavax_new/screen/home.dart';
 import 'package:stavax_new/screen/loginAndSignUp.dart';
@@ -49,6 +51,9 @@ class MainScreen extends StatelessWidget {
             // Show a loading indicator while checking authentication state.
             return CircularProgressIndicator();
           } else if (snapshot.hasData) {
+            context.read<ListOfSongs>().songArray = [];
+            context.read<UsersProvider>().songArtist = [];
+            context.read<UsersProvider>().playListArr = [];
             // FirebaseAuth.instance.currentUser!.uid;
             return Home();
           } else {
