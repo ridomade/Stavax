@@ -45,7 +45,6 @@ class UsersProvider extends ChangeNotifier {
     required File? selectedImage,
     required String? selectedImageFileName,
     required String imageUrll,
-    // required String imageNameInStorage,
   }) async {
     if (namePlaylist.isNotEmpty &&
         selectedImage != null &&
@@ -89,34 +88,6 @@ class UsersProvider extends ChangeNotifier {
       ));
       notifyListeners();
     }
-    // if (playListArr.isEmpty) {
-    //   for (var i = 0; i < playlist.length; i++) {
-    //     print("p");
-    //     print(i);
-    //     print(playlist.length);
-    //     playListArr.add(Playlist(
-    //       id: playlist[i].id,
-    //       name: playlist[i].name,
-    //       image: playlist[i].imageUrl,
-    //       desc: playlist[i].desc,
-    //       imageUrl: playlist[i].imageUrl,
-    //     ));
-    //   }
-    // } else {
-    //   playListArr.clear();
-    //   for (var i = 0; i < playlist.length; i++) {
-    //     print("p");
-    //     print(i);
-    //     print(playlist.length);
-    //     playListArr.add(Playlist(
-    //       id: playlist[i].id,
-    //       name: playlist[i].name,
-    //       image: playlist[i].imageUrl,
-    //       desc: playlist[i].desc,
-    //       imageUrl: playlist[i].imageUrl,
-    //     ));
-    //   }
-    // }
   }
 
   void tambahPlaylistBaru2({
@@ -137,15 +108,8 @@ class UsersProvider extends ChangeNotifier {
         desc: descPlaylist, // Menggunakan value dari descPlaylist
         imageUrl: imageUrll,
       ));
-      // print(id);
-      // print(namePlaylist);
-      // print(selectedImage);
-      // print(descPlaylist);
-      // print(imageUrll);
 
       notifyListeners();
-      // Bersihkan input setelah menambah playlist baru
-      // Lakukan tindakan lain setelah berhasil menambahkan playlist
     }
   }
 
@@ -178,11 +142,7 @@ class UsersProvider extends ChangeNotifier {
       },
       onError: (e) => print("Error completing: $e"),
     );
-    // print(playlist.id);
-    // print(playlist.name);
-    // print(playlist.desc);
-    // print(playlist.image);
-    // print(playlist.imageUrl);
+
     playListArr.remove(playlist);
     notifyListeners();
   }
@@ -193,7 +153,7 @@ class UsersProvider extends ChangeNotifier {
     var songReference =
         FirebaseFirestore.instance.collection("Songs").doc(song.id);
     var db = FirebaseFirestore.instance;
-    db
+    await db
         .collection("Users")
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .collection("Playlist")
@@ -204,7 +164,7 @@ class UsersProvider extends ChangeNotifier {
           if (await docSnapshot.data()["namePlaylist"] == playlist.name &&
               await docSnapshot.data()["descPlaylist"] == playlist.desc &&
               await docSnapshot.data()["imageUrl"] == playlist.imageUrl) {
-            db
+            await db
                 .collection("Users")
                 .doc(FirebaseAuth.instance.currentUser!.uid)
                 .collection("Playlist")
@@ -275,7 +235,10 @@ class UsersProvider extends ChangeNotifier {
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .collection("ArtistSong");
 
-    deletedSongCollection.doc(song.id).get().then((DocumentSnapshot doc) async {
+    await deletedSongCollection
+        .doc(song.id)
+        .get()
+        .then((DocumentSnapshot doc) async {
       final data = doc.data() as Map<String, dynamic>;
 
       await FirebaseStorage.instance
@@ -287,7 +250,7 @@ class UsersProvider extends ChangeNotifier {
           .child("Song/Images/" + data["imageNameUrl"])
           .delete();
       await deletedSongCollection.doc(song.id).delete();
-      deletedArtistSongCollection
+      await deletedArtistSongCollection
           .where("song", isEqualTo: deletedSongCollection.doc(song.id))
           .get()
           .then((querySnapshot) async {
@@ -311,7 +274,10 @@ class UsersProvider extends ChangeNotifier {
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .collection("ArtistSong");
 
-    deletedSongCollection.doc(song.id).get().then((DocumentSnapshot doc) async {
+    await deletedSongCollection
+        .doc(song.id)
+        .get()
+        .then((DocumentSnapshot doc) async {
       final data = doc.data() as Map<String, dynamic>;
 
       await FirebaseStorage.instance
@@ -325,7 +291,7 @@ class UsersProvider extends ChangeNotifier {
       // delete Songs Collection
       await deletedSongCollection.doc(song.id).delete();
       // delete ArtistSong Collection
-      deletedArtistSongCollection
+      await deletedArtistSongCollection
           .where("song", isEqualTo: deletedSongCollection.doc(song.id))
           .get()
           .then((querySnapshot) async {
@@ -364,14 +330,7 @@ class UsersProvider extends ChangeNotifier {
           song: song,
         ));
 
-        // print(id);
-        // print(title);
-        // print(artist);
-        // print(image);
-        // print(song);
         notifyListeners();
-        // Bersihkan input setelah menambah playlist baru
-        // Lakukan tindakan lain setelah berhasil menambahkan playlist
       } else {
         // File lokal tidak ditemukan, Anda perlu menanganinya sesuai kebutuhan Anda
         print('File lokal tidak ditemukan.');
